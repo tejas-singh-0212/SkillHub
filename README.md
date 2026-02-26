@@ -6,4 +6,5 @@ A community platform where people can offer and request local skills/services (t
 - Tejas Singh
 - Manthan Gupta
 - Mohit Agarwal
+- Shubham Raj
 ```
