@@ -4,7 +4,4 @@ A community platform where people can offer and request local skills/services (t
 ## Members
 ```
 - Tejas Singh
-- Mohit Agarwal
-- Manthan Gupta
-- Shubham Raj
 ```
