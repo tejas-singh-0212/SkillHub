@@ -6,16 +6,19 @@ import {
   signOut,
   onAuthStateChanged,
   updateProfile as updateFirebaseProfile,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 import { doc, setDoc, getDoc, serverTimestamp } from "firebase/firestore";
 import { auth, db } from "./firebase";
 
+// Generate avatar URL
 function generateAvatar(name) {
   return `https://ui-avatars.com/api/?name=${encodeURIComponent(
     name
   )}&background=random&color=fff&size=200&bold=true`;
 }
 
+// Email/Password Sign Up
 export async function signUp(email, password, name) {
   const userCredential = await createUserWithEmailAndPassword(
     auth,
@@ -48,6 +51,7 @@ export async function signUp(email, password, name) {
   return userCredential.user;
 }
 
+// Email/Password Sign In
 export async function signIn(email, password) {
   const userCredential = await signInWithEmailAndPassword(
     auth,
@@ -57,11 +61,13 @@ export async function signIn(email, password) {
   return userCredential.user;
 }
 
+// Google Sign In (with onboarding check)
 export async function signInWithGoogle() {
   const provider = new GoogleAuthProvider();
   const result = await signInWithPopup(auth, provider);
 
   const userDoc = await getDoc(doc(db, "users", result.user.uid));
+
   let isNewUser = false;
   let onboardingComplete = false;
 
@@ -99,18 +105,26 @@ export async function signInWithGoogle() {
   };
 }
 
+// Sign Out
 export async function logOut() {
   await signOut(auth);
 }
 
+// Auth State Listener
 export function onAuthChange(callback) {
   return onAuthStateChanged(auth, callback);
 }
 
+// Get User Profile
 export async function getUserProfile(uid) {
   const docSnap = await getDoc(doc(db, "users", uid));
   if (docSnap.exists()) {
     return { id: docSnap.id, ...docSnap.data() };
   }
   return null;
+}
+
+// Password Reset
+export async function resetPassword(email) {
+  await sendPasswordResetEmail(auth, email);
 }
