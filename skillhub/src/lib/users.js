@@ -1,12 +1,13 @@
 import {
   doc,
+  getDoc,
   updateDoc,
   arrayUnion,
-  arrayRemove,
 } from "firebase/firestore";
 import { geohashForLocation } from "geofire-common";
 import { db } from "./firebase";
 
+// Update basic profile info
 export async function updateProfile(userId, data) {
   const updates = {
     name: data.name,
@@ -23,6 +24,7 @@ export async function updateProfile(userId, data) {
   await updateDoc(doc(db, "users", userId), updates);
 }
 
+// Update location with geohash
 export async function updateLocation(userId, locationData) {
   const { lat, lng, city, area, fullAddress } = locationData;
   const geohash = geohashForLocation([lat, lng]);
@@ -39,6 +41,7 @@ export async function updateLocation(userId, locationData) {
   });
 }
 
+// Add skill offered
 export async function addSkillOffered(userId, skill) {
   const newSkill = {
     id: `skill_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
@@ -59,12 +62,28 @@ export async function addSkillOffered(userId, skill) {
   return newSkill;
 }
 
+// Remove skill offered (FIXED - filter by ID)
 export async function removeSkillOffered(userId, skill) {
+  // Fetch current user data
+  const userDoc = await getDoc(doc(db, "users", userId));
+  
+  if (!userDoc.exists()) {
+    throw new Error("User not found");
+  }
+
+  const userData = userDoc.data();
+  const currentSkills = userData.skillsOffered || [];
+
+  // Filter out the skill by ID
+  const updatedSkills = currentSkills.filter((s) => s.id !== skill.id);
+
+  // Write back the filtered array
   await updateDoc(doc(db, "users", userId), {
-    skillsOffered: arrayRemove(skill),
+    skillsOffered: updatedSkills,
   });
 }
 
+// Add skill needed
 export async function addSkillNeeded(userId, skill) {
   const newSkill = {
     id: `need_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
@@ -81,18 +100,35 @@ export async function addSkillNeeded(userId, skill) {
   return newSkill;
 }
 
+// Remove skill needed (FIXED - filter by ID)
 export async function removeSkillNeeded(userId, skill) {
+  // Fetch current user data
+  const userDoc = await getDoc(doc(db, "users", userId));
+  
+  if (!userDoc.exists()) {
+    throw new Error("User not found");
+  }
+
+  const userData = userDoc.data();
+  const currentSkills = userData.skillsNeeded || [];
+
+  // Filter out the skill by ID
+  const updatedSkills = currentSkills.filter((s) => s.id !== skill.id);
+
+  // Write back the filtered array
   await updateDoc(doc(db, "users", userId), {
-    skillsNeeded: arrayRemove(skill),
+    skillsNeeded: updatedSkills,
   });
 }
 
+// Complete onboarding
 export async function completeOnboarding(userId) {
   await updateDoc(doc(db, "users", userId), {
     onboardingComplete: true,
   });
 }
 
+// Constants
 export const SKILL_CATEGORIES = [
   { id: "tutoring", icon: "📚", label: "Tutoring & Academics" },
   { id: "music", icon: "🎵", label: "Music & Instruments" },
