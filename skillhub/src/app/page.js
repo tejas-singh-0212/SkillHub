@@ -19,8 +19,8 @@ export default function HomePage() {
               <span className="text-yellow-300">Build Community</span>
             </h1>
             <p className="text-xl md:text-2xl text-blue-100 mb-8 leading-relaxed">
-              Offer your talents. Learn something new. 
-              Barter, pay, or share for free, all within your local neighborhood.
+              Offer your talents. Learn something new. Barter, pay, or share for
+              free, all within your local neighborhood.
             </p>
             <div className="flex flex-wrap gap-4">
               {!loading && !user ? (
