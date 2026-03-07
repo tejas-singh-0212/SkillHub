@@ -208,7 +208,7 @@ export default function HomePage() {
             Skill Exchange Platform
           </p>
           <p className="mt-2 text-sm">
-            Built by Bit Benders for Elite Hack 1.0
+            Built by Bit Benders with 🖤 for Elite Hack 1.0
           </p>
         </div>
       </footer>
