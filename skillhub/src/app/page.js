@@ -20,7 +20,7 @@ export default function HomePage() {
             </h1>
             <p className="text-xl md:text-2xl text-blue-100 mb-8 leading-relaxed">
               Offer your talents. Learn something new. Barter, pay, or share for
-              free — all within your local neighborhood.
+              free, all within your local neighborhood.
             </p>
             <div className="flex flex-wrap gap-4">
               {!loading && !user ? (
@@ -44,13 +44,13 @@ export default function HomePage() {
                     href="/search"
                     className="bg-yellow-400 text-gray-900 px-8 py-4 rounded-xl text-lg font-bold hover:bg-yellow-300 transition shadow-lg"
                   >
-                    🔍 Find Skills Near You
+                    Find Skills Near You
                   </Link>
                   <Link
                     href="/dashboard"
                     className="bg-white/10 text-white px-8 py-4 rounded-xl text-lg font-medium hover:bg-white/20 transition border border-white/30"
                   >
-                    📊 My Dashboard
+                    My Dashboard
                   </Link>
                 </>
               ) : null}

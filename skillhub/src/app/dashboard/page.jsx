@@ -1,5 +1,3 @@
-// src/app/dashboard/page.jsx
-
 "use client";
 
 import { useAuth } from "@/components/AuthProvider";
@@ -22,7 +20,6 @@ export default function DashboardPage() {
     }
   }, [loading, user, profile, router]);
 
-  // Listen to bookings
   useEffect(() => {
     if (!user) return;
     const unsub = listenToMyBookings(user.uid, (allBookings) => {
@@ -31,7 +28,6 @@ export default function DashboardPage() {
     return () => unsub();
   }, [user]);
 
-  // Get smart matches
   useEffect(() => {
     if (!user || !profile) return;
     getSmartMatches(user.uid, profile).then((m) => setMatches(m.slice(0, 4)));
