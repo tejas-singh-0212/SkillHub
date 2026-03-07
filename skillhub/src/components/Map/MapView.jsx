@@ -53,8 +53,7 @@ export default function MapView({
     <MapContainer
       center={[center.lat, center.lng]}
       zoom={userLocation ? 13 : 5}
-      className="h-[400px] w-full rounded-xl"
-      style={{ zIndex: 1 }}
+      style={{ height: "400px", width: "100%", zIndex: 1 }}
     >
       {/* FREE map tiles from OpenStreetMap — no API key needed */}
       <TileLayer
