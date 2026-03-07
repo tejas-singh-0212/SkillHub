@@ -8,6 +8,10 @@ import {
   onSnapshot,
   serverTimestamp,
   getDoc,
+  orderBy,    
+  limit,      
+  startAfter, 
+  getDocs,    
 } from "firebase/firestore";
 import { db } from "./firebase";
 import { createNotification } from "./notifications";
@@ -163,5 +167,80 @@ export function listenToMyBookings(userId, callback) {
   return () => {
     unsub1();
     unsub2();
+  };
+}
+
+// Paginated bookings (for large lists)
+export async function getReceivedBookingsPaginated(
+  userId,
+  lastDoc = null,
+  pageSize = 10
+) {
+  let q;
+
+  if (lastDoc) {
+    q = query(
+      collection(db, "bookings"),
+      where("providerId", "==", userId),
+      orderBy("createdAt", "desc"),
+      startAfter(lastDoc),
+      limit(pageSize)
+    );
+  } else {
+    q = query(
+      collection(db, "bookings"),
+      where("providerId", "==", userId),
+      orderBy("createdAt", "desc"),
+      limit(pageSize)
+    );
+  }
+
+  const snapshot = await getDocs(q);
+
+  return {
+    bookings: snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+      role: "provider",
+    })),
+    lastDoc: snapshot.docs[snapshot.docs.length - 1] || null,
+    hasMore: snapshot.docs.length === pageSize,
+  };
+}
+
+export async function getSentBookingsPaginated(
+  userId,
+  lastDoc = null,
+  pageSize = 10
+) {
+  let q;
+
+  if (lastDoc) {
+    q = query(
+      collection(db, "bookings"),
+      where("requesterId", "==", userId),
+      orderBy("createdAt", "desc"),
+      startAfter(lastDoc),
+      limit(pageSize)
+    );
+  } else {
+    q = query(
+      collection(db, "bookings"),
+      where("requesterId", "==", userId),
+      orderBy("createdAt", "desc"),
+      limit(pageSize)
+    );
+  }
+
+  const snapshot = await getDocs(q);
+
+  return {
+    bookings: snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+      role: "requester",
+    })),
+    lastDoc: snapshot.docs[snapshot.docs.length - 1] || null,
+    hasMore: snapshot.docs.length === pageSize,
   };
 }

@@ -5,26 +5,28 @@ import {
   startAt,
   endAt,
   getDocs,
+  limit,
+  startAfter,
 } from "firebase/firestore";
 import { geohashQueryBounds, distanceBetween } from "geofire-common";
 import { db } from "./firebase";
 
-
+// Search nearby skills (with pagination)
 export async function searchNearbySkills(
   centerLat,
   centerLng,
   radiusInKm,
   categoryFilter,
-  priceTypeFilter
+  priceTypeFilter,
+  pageSize = 20,
+  existingResults = []
 ) {
   const center = [centerLat, centerLng];
   const radiusInM = radiusInKm * 1000;
 
-
   const bounds = geohashQueryBounds(center, radiusInM);
   const promises = [];
 
-  
   for (const b of bounds) {
     const q = query(
       collection(db, "users"),
@@ -38,26 +40,23 @@ export async function searchNearbySkills(
   const snapshots = await Promise.all(promises);
 
   const results = [];
+  const existingIds = new Set(existingResults.map((r) => r.id));
+
   for (const snap of snapshots) {
     for (const docSnap of snap.docs) {
       const data = docSnap.data();
       const loc = data.location;
 
-      
       if (!loc || !loc.latitude || !loc.longitude) continue;
 
-      
       const distanceInKm = distanceBetween(
         [loc.latitude, loc.longitude],
         center
       );
 
-      
       if (distanceInKm <= radiusInKm) {
-        
         if (!data.skillsOffered || data.skillsOffered.length === 0) continue;
 
-        
         if (categoryFilter) {
           const hasCategory = data.skillsOffered.some(
             (s) => s.category === categoryFilter
@@ -65,7 +64,6 @@ export async function searchNearbySkills(
           if (!hasCategory) continue;
         }
 
-        
         if (priceTypeFilter) {
           const hasPriceType = data.skillsOffered.some(
             (s) => s.priceType === priceTypeFilter
@@ -73,8 +71,10 @@ export async function searchNearbySkills(
           if (!hasPriceType) continue;
         }
 
-      
-        if (!results.find((r) => r.id === docSnap.id)) {
+        if (
+          !results.find((r) => r.id === docSnap.id) &&
+          !existingIds.has(docSnap.id)
+        ) {
           results.push({
             id: docSnap.id,
             ...data,
@@ -85,14 +85,21 @@ export async function searchNearbySkills(
     }
   }
 
-  
   return results.sort((a, b) => a.distance - b.distance);
 }
 
-
-export async function searchBySkillName(keyword) {
+// Search by skill name (with pagination)
+export async function searchBySkillName(keyword, lastDoc = null, pageSize = 20) {
   const usersRef = collection(db, "users");
-  const snapshot = await getDocs(usersRef);
+
+  let q;
+  if (lastDoc) {
+    q = query(usersRef, orderBy("name"), startAfter(lastDoc), limit(pageSize));
+  } else {
+    q = query(usersRef, orderBy("name"), limit(pageSize));
+  }
+
+  const snapshot = await getDocs(q);
 
   const results = [];
   const keywordLower = keyword.toLowerCase();
@@ -115,32 +122,51 @@ export async function searchBySkillName(keyword) {
     }
   });
 
-  return results;
+  return {
+    results,
+    lastDoc: snapshot.docs[snapshot.docs.length - 1] || null,
+    hasMore: snapshot.docs.length === pageSize,
+  };
 }
 
+// Smart barter matches (with pagination)
+export async function getSmartMatches(
+  userId,
+  userProfile,
+  lastDoc = null,
+  pageSize = 20
+) {
+  if (!userProfile) return { matches: [], lastDoc: null, hasMore: false };
 
-export async function getSmartMatches(userId, userProfile) {
-  if (!userProfile) return [];
-
-  const myNeededSkills = userProfile.skillsNeeded?.map((s) => s.category) || [];
+  const myNeededSkills =
+    userProfile.skillsNeeded?.map((s) => s.category) || [];
   const myOfferedSkills =
     userProfile.skillsOffered?.map((s) => s.category) || [];
 
-  if (myNeededSkills.length === 0 || myOfferedSkills.length === 0) return [];
+  if (myNeededSkills.length === 0 || myOfferedSkills.length === 0) {
+    return { matches: [], lastDoc: null, hasMore: false };
+  }
 
   const usersRef = collection(db, "users");
-  const snapshot = await getDocs(usersRef);
+
+  let q;
+  if (lastDoc) {
+    q = query(usersRef, orderBy("name"), startAfter(lastDoc), limit(pageSize));
+  } else {
+    q = query(usersRef, orderBy("name"), limit(pageSize));
+  }
+
+  const snapshot = await getDocs(q);
 
   const matches = [];
 
   snapshot.forEach((docSnap) => {
-    if (docSnap.id === userId) return; 
+    if (docSnap.id === userId) return;
 
     const data = docSnap.data();
     const theirOffered = data.skillsOffered?.map((s) => s.category) || [];
     const theirNeeded = data.skillsNeeded?.map((s) => s.category) || [];
 
-    
     const theyOfferWhatINeed = myNeededSkills.some((cat) =>
       theirOffered.includes(cat)
     );
@@ -163,12 +189,17 @@ export async function getSmartMatches(userId, userProfile) {
     }
   });
 
-  
-  return matches.sort((a, b) => {
+  matches.sort((a, b) => {
     if (a.matchType === "perfect_barter" && b.matchType !== "perfect_barter")
       return -1;
     if (b.matchType === "perfect_barter" && a.matchType !== "perfect_barter")
       return 1;
     return 0;
   });
+
+  return {
+    matches,
+    lastDoc: snapshot.docs[snapshot.docs.length - 1] || null,
+    hasMore: snapshot.docs.length === pageSize,
+  };
 }

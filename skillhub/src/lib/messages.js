@@ -11,6 +11,9 @@ import {
   serverTimestamp,
   getDoc,
   increment,
+  limit,        
+  startAfter,   
+  getDocs,      
 } from "firebase/firestore";
 import { db } from "./firebase";
 import { createNotification } from "./notifications";
@@ -141,4 +144,39 @@ export async function markAsRead(convoId, userId) {
   await updateDoc(doc(db, "conversations", convoId), {
     [`unreadCount.${userId}`]: 0,
   });
+}
+
+// Load older messages (pagination)
+export async function loadOlderMessages(convoId, oldestMessage, pageSize = 30) {
+  let q;
+
+  if (oldestMessage?.createdAt) {
+    q = query(
+      collection(db, "conversations", convoId, "messages"),
+      orderBy("createdAt", "desc"),
+      startAfter(oldestMessage.createdAt),
+      limit(pageSize)
+    );
+  } else {
+    q = query(
+      collection(db, "conversations", convoId, "messages"),
+      orderBy("createdAt", "desc"),
+      limit(pageSize)
+    );
+  }
+
+  const snapshot = await getDocs(q);
+
+  const messages = snapshot.docs
+    .map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }))
+    // Reverse to get chronological order
+    .reverse(); 
+
+  return {
+    messages,
+    hasMore: snapshot.docs.length === pageSize,
+  };
 }

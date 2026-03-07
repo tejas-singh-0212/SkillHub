@@ -20,6 +20,8 @@ const DynamicMap = dynamic(() => import("@/components/Map/DynamicMap"), {
   ),
 });
 
+const PAGE_SIZE = 12;
+
 function SearchContent() {
   const { user } = useAuth();
   const searchParams = useSearchParams();
@@ -29,7 +31,10 @@ function SearchContent() {
   const [userLocation, setUserLocation] = useState(null);
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [searched, setSearched] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
+  const [lastDoc, setLastDoc] = useState(null);
 
   const [queryText, setQueryText] = useState("");
   const [category, setCategory] = useState(
@@ -52,41 +57,71 @@ function SearchContent() {
     }
   }, [userLocation]);
 
-  const handleSearch = async () => {
-    setLoading(true);
+  const handleSearch = async (isLoadMore = false) => {
+    if (isLoadMore) {
+      setLoadingMore(true);
+    } else {
+      setLoading(true);
+      setResults([]);
+      setLastDoc(null);
+      setHasMore(false);
+    }
     setSearched(true);
 
     try {
       let data = [];
 
+      // Nearby search
       if (userLocation) {
-        data = await searchNearbySkills(
+        const nearbyResults = await searchNearbySkills(
           userLocation.lat,
           userLocation.lng,
           radius,
           category,
-          priceType
+          priceType,
+          PAGE_SIZE,
+          isLoadMore ? results : []
         );
+        data = nearbyResults;
       }
 
+      // Text search
       if (queryText.trim()) {
-        const textResults = await searchBySkillName(queryText);
-        for (const tr of textResults) {
+        const textResult = await searchBySkillName(
+          queryText,
+          isLoadMore ? lastDoc : null,
+          PAGE_SIZE
+        );
+
+        for (const tr of textResult.results) {
           if (!data.find((d) => d.id === tr.id)) {
             data.push(tr);
           }
         }
+
+        setLastDoc(textResult.lastDoc);
+        setHasMore(textResult.hasMore);
       }
 
+      // Exclude self
       if (user) {
         data = data.filter((d) => d.id !== user.uid);
       }
 
-      setResults(data);
+      if (isLoadMore) {
+        setResults((prev) => {
+          const existingIds = new Set(prev.map((r) => r.id));
+          const newResults = data.filter((d) => !existingIds.has(d.id));
+          return [...prev, ...newResults];
+        });
+      } else {
+        setResults(data);
+      }
     } catch (err) {
       console.error("Search error:", err);
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
   };
 
@@ -115,7 +150,11 @@ function SearchContent() {
             or search by skill name below.
           </p>
           <button
-            onClick={() => getCurrentLocation().then(setUserLocation).catch(() => {})}
+            onClick={() =>
+              getCurrentLocation()
+                .then(setUserLocation)
+                .catch(() => {})
+            }
             className="text-yellow-700 underline text-sm mt-1"
           >
             Try again
@@ -128,7 +167,8 @@ function SearchContent() {
           📍 Searching near:{" "}
           {userLocation.area
             ? `${userLocation.area}, ${userLocation.city}`
-            : userLocation.city || `${userLocation.lat.toFixed(2)}, ${userLocation.lng.toFixed(2)}`}
+            : userLocation.city ||
+              `${userLocation.lat.toFixed(2)}, ${userLocation.lng.toFixed(2)}`}
         </p>
       )}
 
@@ -180,7 +220,7 @@ function SearchContent() {
           </select>
 
           <button
-            onClick={handleSearch}
+            onClick={() => handleSearch()}
             disabled={loading}
             className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
           >
@@ -234,11 +274,32 @@ function SearchContent() {
 
       {/* List View */}
       {viewMode === "list" && searched && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {results.map((person) => (
-            <UserCard key={person.id} user={person} />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {results.map((person) => (
+              <UserCard key={person.id} user={person} />
+            ))}
+          </div>
+
+          {/* ✅ Load More Button */}
+          {hasMore && (
+            <div className="text-center mt-8">
+              <button
+                onClick={() => handleSearch(true)}
+                disabled={loadingMore}
+                className="bg-white border-2 border-blue-600 text-blue-600 px-8 py-3 rounded-xl font-semibold hover:bg-blue-50 transition disabled:opacity-50"
+              >
+                {loadingMore ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <span className="animate-spin">🔄</span> Loading more...
+                  </span>
+                ) : (
+                  "Load More Results"
+                )}
+              </button>
+            </div>
+          )}
+        </>
       )}
 
       {/* Empty State */}
@@ -275,12 +336,13 @@ function SearchContent() {
                 key={cat.id}
                 onClick={() => {
                   setCategory(cat.id);
-                  setTimeout(() => handleSearch(), 100);
                 }}
                 className="bg-white rounded-xl p-4 text-center hover:shadow-md transition border hover:border-blue-300"
               >
                 <div className="text-2xl mb-1">{cat.icon}</div>
-                <p className="text-xs font-medium text-gray-700">{cat.label}</p>
+                <p className="text-xs font-medium text-gray-700">
+                  {cat.label}
+                </p>
               </button>
             ))}
           </div>
@@ -289,9 +351,16 @@ function SearchContent() {
     </div>
   );
 }
+
 export default function SearchPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading search...</div>}>
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          Loading search...
+        </div>
+      }
+    >
       <SearchContent />
     </Suspense>
   );
