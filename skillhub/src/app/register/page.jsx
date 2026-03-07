@@ -1,5 +1,3 @@
-// src/app/register/page.jsx
-
 "use client";
 
 import { useState } from "react";
@@ -60,8 +58,13 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      await signInWithGoogle();
-      router.push("/onboarding");
+      const result = await signInWithGoogle();
+      
+      if (result.onboardingComplete) {
+        router.push("/dashboard");
+      } else {
+        router.push("/onboarding");
+      }
     } catch (err) {
       if (err.code !== "auth/popup-closed-by-user") {
         setError(err.message);

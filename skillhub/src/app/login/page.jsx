@@ -40,8 +40,13 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      await signInWithGoogle();
-      router.push("/dashboard");
+      const result = await signInWithGoogle();
+      
+      if (result.onboardingComplete) {
+        router.push("/dashboard");
+      } else {
+        router.push("/onboarding");
+      }
     } catch (err) {
       if (err.code !== "auth/popup-closed-by-user") {
         setError(err.message);
