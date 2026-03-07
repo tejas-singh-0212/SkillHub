@@ -22,51 +22,40 @@ export default function NotificationBell() {
   // Listen to notifications
   useEffect(() => {
     if (!user) return;
-
     const unsub = listenToNotifications(user.uid, (notifs) => {
       setNotifications(notifs);
     });
-
     return () => unsub();
   }, [user]);
 
-  // Listen to unread messages count
+  // Listen to unread messages
   useEffect(() => {
     if (!user) return;
-
     const unsub = listenToTotalUnreadMessages(user.uid, (count) => {
       setUnreadMessages(count);
     });
-
     return () => unsub();
   }, [user]);
 
-  // Close dropdown on outside click
+  // Close on outside click
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setIsOpen(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Count unread notifications
   const unreadNotifications = notifications.filter((n) => !n.isRead).length;
-  
-  // Total badge count = unread notifications + unread messages
   const totalBadgeCount = unreadNotifications + unreadMessages;
 
-  // Handle notification click
   const handleNotificationClick = async (notif) => {
-    // Mark as read
     if (!notif.isRead) {
       await markNotificationRead(user.uid, notif.id);
     }
 
-    // Navigate based on notification type
     switch (notif.type) {
       case "new_booking":
       case "booking_accepted":
@@ -76,7 +65,6 @@ export default function NotificationBell() {
         router.push("/bookings");
         break;
       case "new_message":
-        // Navigate to messages with specific conversation if available
         if (notif.conversationId) {
           router.push(`/messages?convo=${notif.conversationId}`);
         } else {
@@ -89,58 +77,43 @@ export default function NotificationBell() {
       default:
         break;
     }
-
     setIsOpen(false);
   };
 
-  // Mark all as read
   const handleMarkAllRead = async () => {
     if (unreadNotifications === 0) return;
     setLoading(true);
     try {
       await markAllNotificationsRead(user.uid);
     } catch (err) {
-      console.error("Error marking all as read:", err);
+      console.error("Error:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  // Get icon based on notification type
-  const getNotificationIcon = (type) => {
-    switch (type) {
-      case "new_booking":
-        return "📅";
-      case "booking_accepted":
-        return "✅";
-      case "booking_declined":
-        return "❌";
-      case "booking_completed":
-        return "🎉";
-      case "booking_cancelled":
-        return "🚫";
-      case "new_message":
-        return "💬";
-      case "new_review":
-        return "⭐";
-      default:
-        return "🔔";
-    }
+  const getIcon = (type) => {
+    const icons = {
+      new_booking: "📅",
+      booking_accepted: "✅",
+      booking_declined: "❌",
+      booking_completed: "🎉",
+      booking_cancelled: "🚫",
+      new_message: "💬",
+      new_review: "⭐",
+    };
+    return icons[type] || "🔔";
   };
 
-  // Format time ago
   const formatTimeAgo = (timestamp) => {
     if (!timestamp?.toDate) return "";
-
     const now = new Date();
     const date = timestamp.toDate();
-    const diffInSeconds = Math.floor((now - date) / 1000);
-
-    if (diffInSeconds < 60) return "Just now";
-    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
-    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
-    if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}d ago`;
-
+    const diff = Math.floor((now - date) / 1000);
+    if (diff < 60) return "Just now";
+    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+    if (diff < 604800) return `${Math.floor(diff / 86400)}d ago`;
     return date.toLocaleDateString();
   };
 
@@ -167,7 +140,7 @@ export default function NotificationBell() {
           />
         </svg>
 
-        {/* Badge shows total (notifications + messages) */}
+        {/* Badge */}
         {totalBadgeCount > 0 && (
           <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
             {totalBadgeCount > 9 ? "9+" : totalBadgeCount}
@@ -182,10 +155,10 @@ export default function NotificationBell() {
           <div className="flex items-center justify-between px-4 py-3 border-b bg-gray-50">
             <div>
               <h3 className="font-bold text-gray-800">Notifications</h3>
-              {/* Show unread messages count separately */}
               {unreadMessages > 0 && (
                 <p className="text-xs text-blue-600">
-                  💬 {unreadMessages} unread message{unreadMessages > 1 ? "s" : ""}
+                  💬 {unreadMessages} unread message
+                  {unreadMessages > 1 ? "s" : ""}
                 </p>
               )}
             </div>
@@ -200,7 +173,7 @@ export default function NotificationBell() {
             )}
           </div>
 
-          {/* Quick link to messages if there are unread */}
+          {/* Unread Messages Quick Link */}
           {unreadMessages > 0 && (
             <div
               onClick={() => {
@@ -212,9 +185,12 @@ export default function NotificationBell() {
               <div className="text-2xl">💬</div>
               <div className="flex-1">
                 <p className="font-semibold text-blue-800">
-                  {unreadMessages} Unread Message{unreadMessages > 1 ? "s" : ""}
+                  {unreadMessages} Unread Message
+                  {unreadMessages > 1 ? "s" : ""}
                 </p>
-                <p className="text-sm text-blue-600">Tap to view your messages</p>
+                <p className="text-sm text-blue-600">
+                  Tap to view your messages
+                </p>
               </div>
               <div className="text-blue-400">→</div>
             </div>
@@ -240,12 +216,9 @@ export default function NotificationBell() {
                     !notif.isRead ? "bg-blue-50" : ""
                   }`}
                 >
-                  {/* Icon */}
                   <div className="text-2xl flex-shrink-0">
-                    {getNotificationIcon(notif.type)}
+                    {getIcon(notif.type)}
                   </div>
-
-                  {/* Content */}
                   <div className="flex-1 min-w-0">
                     <p
                       className={`text-sm ${
@@ -261,8 +234,6 @@ export default function NotificationBell() {
                       {formatTimeAgo(notif.createdAt)}
                     </p>
                   </div>
-
-                  {/* Unread dot */}
                   {!notif.isRead && (
                     <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-2" />
                   )}

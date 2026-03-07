@@ -50,9 +50,9 @@ export async function createConversation(currentUser, otherUser) {
   return convoId;
 }
 
-// Send a message (with notification)
+// Send a message + NOTIFY recipient
 export async function sendMessage(convoId, senderId, content) {
-  // Add the message to subcollection
+  // Add message
   await addDoc(collection(db, "conversations", convoId, "messages"), {
     senderId,
     content,
@@ -60,28 +60,26 @@ export async function sendMessage(convoId, senderId, content) {
     createdAt: serverTimestamp(),
   });
 
-  // Get conversation data for notification
+  // Get conversation data
   const convoSnap = await getDoc(doc(db, "conversations", convoId));
   const convoData = convoSnap.data();
   const otherUserId = convoData.participants.find((p) => p !== senderId);
   const senderName = convoData.participantNames?.[senderId] || "Someone";
 
-  // Update conversation metadata with atomic increment
+  // Update conversation with atomic increment
   await updateDoc(doc(db, "conversations", convoId), {
     lastMessage: content,
     lastMessageTime: serverTimestamp(),
     [`unreadCount.${otherUserId}`]: increment(1),
   });
 
-  // notify Other user about new message
-  // Truncate message preview to 50 chars
-  const messagePreview = content.length > 50 
-    ? content.substring(0, 50) + "..." 
-    : content;
+  // notify: Recipient about new message
+  const messagePreview =
+    content.length > 50 ? content.substring(0, 50) + "..." : content;
 
   await createNotification(otherUserId, {
     type: "new_message",
-    title: `New message from ${senderName}`,
+    title: `💬 New message from ${senderName}`,
     message: messagePreview,
     fromUserId: senderId,
     conversationId: convoId,
@@ -121,7 +119,7 @@ export function listenToConversations(userId, callback) {
   });
 }
 
-// Get total unread message count for a user
+// Get total unread message count
 export function listenToTotalUnreadMessages(userId, callback) {
   const q = query(
     collection(db, "conversations"),

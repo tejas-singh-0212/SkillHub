@@ -19,8 +19,7 @@ export async function createNotification(userId, notification) {
     message: notification.message,
     fromUserId: notification.fromUserId || "",
     bookingId: notification.bookingId || "",
-    // Added for message notifications
-    conversationId: notification.conversationId || "", 
+    conversationId: notification.conversationId || "",
     isRead: false,
     createdAt: serverTimestamp(),
   });

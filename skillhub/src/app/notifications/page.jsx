@@ -18,29 +18,22 @@ export default function NotificationsPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!authLoading && !user) {
-      router.push("/login");
-    }
+    if (!authLoading && !user) router.push("/login");
   }, [authLoading, user, router]);
 
   useEffect(() => {
     if (!user) return;
-
     const unsub = listenToNotifications(user.uid, (notifs) => {
       setNotifications(notifs);
     });
-
     return () => unsub();
   }, [user]);
 
-  // Listen to unread messages
   useEffect(() => {
     if (!user) return;
-
     const unsub = listenToTotalUnreadMessages(user.uid, (count) => {
       setUnreadMessages(count);
     });
-
     return () => unsub();
   }, [user]);
 
@@ -59,7 +52,6 @@ export default function NotificationsPage() {
     if (!notif.isRead) {
       await markNotificationRead(user.uid, notif.id);
     }
-
     switch (notif.type) {
       case "new_booking":
       case "booking_accepted":
@@ -83,25 +75,17 @@ export default function NotificationsPage() {
     }
   };
 
-  const getNotificationIcon = (type) => {
-    switch (type) {
-      case "new_booking":
-        return "📅";
-      case "booking_accepted":
-        return "✅";
-      case "booking_declined":
-        return "❌";
-      case "booking_completed":
-        return "🎉";
-      case "booking_cancelled":
-        return "🚫";
-      case "new_message":
-        return "💬";
-      case "new_review":
-        return "⭐";
-      default:
-        return "🔔";
-    }
+  const getIcon = (type) => {
+    const icons = {
+      new_booking: "📅",
+      booking_accepted: "✅",
+      booking_declined: "❌",
+      booking_completed: "🎉",
+      booking_cancelled: "🚫",
+      new_message: "💬",
+      new_review: "⭐",
+    };
+    return icons[type] || "🔔";
   };
 
   const formatDate = (timestamp) => {
@@ -117,7 +101,7 @@ export default function NotificationsPage() {
     );
   }
 
-  const unreadNotifications = notifications.filter((n) => !n.isRead).length;
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
@@ -126,12 +110,12 @@ export default function NotificationsPage() {
         <div>
           <h1 className="text-3xl font-bold">🔔 Notifications</h1>
           <p className="text-gray-600 mt-1">
-            {unreadNotifications > 0 || unreadMessages > 0
-              ? `${unreadNotifications} notification${unreadNotifications !== 1 ? "s" : ""}, ${unreadMessages} message${unreadMessages !== 1 ? "s" : ""} unread`
+            {unreadCount > 0 || unreadMessages > 0
+              ? `${unreadCount} notification${unreadCount !== 1 ? "s" : ""}, ${unreadMessages} message${unreadMessages !== 1 ? "s" : ""} unread`
               : "You're all caught up!"}
           </p>
         </div>
-        {unreadNotifications > 0 && (
+        {unreadCount > 0 && (
           <button
             onClick={handleMarkAllRead}
             disabled={loading}
@@ -142,7 +126,7 @@ export default function NotificationsPage() {
         )}
       </div>
 
-      {/* ✅ Unread Messages Card */}
+      {/* Unread Messages Card */}
       {unreadMessages > 0 && (
         <div
           onClick={() => router.push("/messages")}
@@ -169,7 +153,8 @@ export default function NotificationsPage() {
           <p className="text-5xl mb-4">🔔</p>
           <h3 className="text-xl font-bold mb-2">No notifications yet</h3>
           <p className="text-gray-600">
-            When you receive bookings, messages, or reviews, they'll appear here.
+            When you receive bookings, messages, or reviews, they'll appear
+            here.
           </p>
         </div>
       ) : (
@@ -183,7 +168,7 @@ export default function NotificationsPage() {
               }`}
             >
               <div className="flex items-start gap-4">
-                <div className="text-3xl">{getNotificationIcon(notif.type)}</div>
+                <div className="text-3xl">{getIcon(notif.type)}</div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
                     <h3

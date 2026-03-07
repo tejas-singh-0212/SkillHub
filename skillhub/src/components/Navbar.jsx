@@ -4,18 +4,31 @@ import Link from "next/link";
 import { useAuth } from "./AuthProvider";
 import { logOut } from "@/lib/auth";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import NotificationBell from "./NotificationBell";
 
 export default function Navbar() {
   const { user, profile, loading } = useAuth();
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   const handleLogout = async () => {
     await logOut();
     setMenuOpen(false);
     router.push("/");
   };
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
@@ -27,7 +40,7 @@ export default function Navbar() {
           </Link>
 
           {!loading && (
-            <div className="hidden md:flex items-center gap-6">
+            <div className="hidden md:flex items-center gap-4">
               {user ? (
                 <>
                   <Link
@@ -55,7 +68,10 @@ export default function Navbar() {
                     📊 Dashboard
                   </Link>
 
-                  <div className="relative">
+                  {/* ✅ Notification Bell */}
+                  <NotificationBell />
+
+                  <div className="relative" ref={dropdownRef}>
                     <button
                       onClick={() => setMenuOpen(!menuOpen)}
                       className="flex items-center gap-2 bg-gray-100 rounded-full pl-1 pr-3 py-1 hover:bg-gray-200 transition"
@@ -74,7 +90,7 @@ export default function Navbar() {
                     </button>
 
                     {menuOpen && (
-                      <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border py-2">
+                      <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border py-2 z-50">
                         <Link
                           href={`/profile/${user.uid}`}
                           className="block px-4 py-2 hover:bg-gray-50 text-sm"
@@ -119,78 +135,35 @@ export default function Navbar() {
             </div>
           )}
 
-          {/* Mobile menu button */}
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="md:hidden text-2xl"
-          >
-            {menuOpen ? "✕" : "☰"}
-          </button>
+          {/* Mobile */}
+          <div className="md:hidden flex items-center gap-2">
+            {user && <NotificationBell />}
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="text-2xl p-2"
+            >
+              {menuOpen ? "✕" : "☰"}
+            </button>
+          </div>
         </div>
 
-        {/* Mobile menu */}
+        {/* Mobile Menu */}
         {menuOpen && (
           <div className="md:hidden py-4 border-t">
             {user ? (
               <div className="space-y-2">
-                <Link
-                  href="/search"
-                  className="block py-2 text-gray-600"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  🔍 Explore
-                </Link>
-                <Link
-                  href="/bookings"
-                  className="block py-2 text-gray-600"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  📅 Bookings
-                </Link>
-                <Link
-                  href="/messages"
-                  className="block py-2 text-gray-600"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  💬 Messages
-                </Link>
-                <Link
-                  href="/dashboard"
-                  className="block py-2 text-gray-600"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  📊 Dashboard
-                </Link>
-                <Link
-                  href={`/profile/${user.uid}`}
-                  className="block py-2 text-gray-600"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  👤 My Profile
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="block py-2 text-red-600"
-                >
-                  🚪 Sign Out
-                </button>
+                <Link href="/search" className="block py-2 text-gray-600" onClick={() => setMenuOpen(false)}>🔍 Explore</Link>
+                <Link href="/bookings" className="block py-2 text-gray-600" onClick={() => setMenuOpen(false)}>📅 Bookings</Link>
+                <Link href="/messages" className="block py-2 text-gray-600" onClick={() => setMenuOpen(false)}>💬 Messages</Link>
+                <Link href="/dashboard" className="block py-2 text-gray-600" onClick={() => setMenuOpen(false)}>📊 Dashboard</Link>
+                <Link href="/notifications" className="block py-2 text-gray-600" onClick={() => setMenuOpen(false)}>🔔 Notifications</Link>
+                <Link href={`/profile/${user.uid}`} className="block py-2 text-gray-600" onClick={() => setMenuOpen(false)}>👤 My Profile</Link>
+                <button onClick={handleLogout} className="block py-2 text-red-600">🚪 Sign Out</button>
               </div>
             ) : (
               <div className="space-y-2">
-                <Link
-                  href="/login"
-                  className="block py-2"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  Log In
-                </Link>
-                <Link
-                  href="/register"
-                  className="block py-2 text-blue-600 font-medium"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  Sign Up Free
-                </Link>
+                <Link href="/login" className="block py-2" onClick={() => setMenuOpen(false)}>Log In</Link>
+                <Link href="/register" className="block py-2 text-blue-600 font-medium" onClick={() => setMenuOpen(false)}>Sign Up Free</Link>
               </div>
             )}
           </div>

@@ -9,10 +9,11 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import { db } from "./firebase";
+import { createNotification } from "./notifications";
 
-
+// Submit a review + NOTIFY reviewee
 export async function submitReview(reviewData) {
-
+  // Create review
   await addDoc(collection(db, "reviews"), {
     bookingId: reviewData.bookingId,
     reviewerId: reviewData.reviewerId,
@@ -24,7 +25,7 @@ export async function submitReview(reviewData) {
     createdAt: serverTimestamp(),
   });
 
-
+  // Recalculate average rating
   const reviewsSnap = await getDocs(
     query(
       collection(db, "reviews"),
@@ -39,13 +40,22 @@ export async function submitReview(reviewData) {
 
   const avgRating = totalRating / reviewsSnap.size;
 
-
   await updateDoc(doc(db, "users", reviewData.revieweeId), {
     averageRating: Math.round(avgRating * 10) / 10,
     totalReviews: reviewsSnap.size,
   });
+
+  // notify: User about new review
+  await createNotification(reviewData.revieweeId, {
+    type: "new_review",
+    title: "New Review Received! ⭐",
+    message: `${reviewData.reviewerName} left you a ${reviewData.rating}-star review`,
+    fromUserId: reviewData.reviewerId,
+    bookingId: reviewData.bookingId,
+  });
 }
 
+// Get reviews for a user
 export async function getReviewsForUser(userId) {
   const q = query(
     collection(db, "reviews"),
@@ -61,6 +71,7 @@ export async function getReviewsForUser(userId) {
     });
 }
 
+// Check if user already reviewed a booking
 export async function hasReviewedBooking(bookingId, reviewerId) {
   const q = query(
     collection(db, "reviews"),
