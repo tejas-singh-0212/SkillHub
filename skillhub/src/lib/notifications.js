@@ -19,6 +19,8 @@ export async function createNotification(userId, notification) {
     message: notification.message,
     fromUserId: notification.fromUserId || "",
     bookingId: notification.bookingId || "",
+    // Added for message notifications
+    conversationId: notification.conversationId || "", 
     isRead: false,
     createdAt: serverTimestamp(),
   });
@@ -38,6 +40,7 @@ export function listenToNotifications(userId, callback) {
     callback(notifs);
   });
 }
+
 export async function markNotificationRead(userId, notificationId) {
   await updateDoc(
     doc(db, "notifications", userId, "items", notificationId),
@@ -46,6 +49,7 @@ export async function markNotificationRead(userId, notificationId) {
     }
   );
 }
+
 export async function markAllNotificationsRead(userId) {
   const q = query(
     collection(db, "notifications", userId, "items"),
@@ -54,10 +58,9 @@ export async function markAllNotificationsRead(userId) {
   const snap = await getDocs(q);
 
   const promises = snap.docs.map((docSnap) =>
-    updateDoc(
-      doc(db, "notifications", userId, "items", docSnap.id),
-      { isRead: true }
-    )
+    updateDoc(doc(db, "notifications", userId, "items", docSnap.id), {
+      isRead: true,
+    })
   );
 
   await Promise.all(promises);

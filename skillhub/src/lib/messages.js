@@ -13,11 +13,14 @@ import {
   increment,
 } from "firebase/firestore";
 import { db } from "./firebase";
+import { createNotification } from "./notifications";
 
+// Generate deterministic conversation ID
 export function getConversationId(uid1, uid2) {
   return [uid1, uid2].sort().join("_");
 }
 
+// Create or get existing conversation
 export async function createConversation(currentUser, otherUser) {
   const convoId = getConversationId(currentUser.id, otherUser.id);
 
@@ -47,7 +50,9 @@ export async function createConversation(currentUser, otherUser) {
   return convoId;
 }
 
+// Send a message (with notification)
 export async function sendMessage(convoId, senderId, content) {
+  // Add the message to subcollection
   await addDoc(collection(db, "conversations", convoId, "messages"), {
     senderId,
     content,
@@ -55,17 +60,35 @@ export async function sendMessage(convoId, senderId, content) {
     createdAt: serverTimestamp(),
   });
 
+  // Get conversation data for notification
   const convoSnap = await getDoc(doc(db, "conversations", convoId));
   const convoData = convoSnap.data();
   const otherUserId = convoData.participants.find((p) => p !== senderId);
+  const senderName = convoData.participantNames?.[senderId] || "Someone";
 
+  // Update conversation metadata with atomic increment
   await updateDoc(doc(db, "conversations", convoId), {
     lastMessage: content,
     lastMessageTime: serverTimestamp(),
     [`unreadCount.${otherUserId}`]: increment(1),
   });
+
+  // notify Other user about new message
+  // Truncate message preview to 50 chars
+  const messagePreview = content.length > 50 
+    ? content.substring(0, 50) + "..." 
+    : content;
+
+  await createNotification(otherUserId, {
+    type: "new_message",
+    title: `New message from ${senderName}`,
+    message: messagePreview,
+    fromUserId: senderId,
+    conversationId: convoId,
+  });
 }
 
+// Listen to messages in a conversation
 export function listenToMessages(convoId, callback) {
   const q = query(
     collection(db, "conversations", convoId, "messages"),
@@ -81,6 +104,7 @@ export function listenToMessages(convoId, callback) {
   });
 }
 
+// Listen to user's conversations
 export function listenToConversations(userId, callback) {
   const q = query(
     collection(db, "conversations"),
@@ -97,6 +121,24 @@ export function listenToConversations(userId, callback) {
   });
 }
 
+// Get total unread message count for a user
+export function listenToTotalUnreadMessages(userId, callback) {
+  const q = query(
+    collection(db, "conversations"),
+    where("participants", "array-contains", userId)
+  );
+
+  return onSnapshot(q, (snapshot) => {
+    let totalUnread = 0;
+    snapshot.docs.forEach((doc) => {
+      const data = doc.data();
+      totalUnread += data.unreadCount?.[userId] || 0;
+    });
+    callback(totalUnread);
+  });
+}
+
+// Mark conversation as read
 export async function markAsRead(convoId, userId) {
   await updateDoc(doc(db, "conversations", convoId), {
     [`unreadCount.${userId}`]: 0,
