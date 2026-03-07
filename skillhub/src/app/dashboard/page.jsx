@@ -30,7 +30,10 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!user || !profile) return;
-    getSmartMatches(user.uid, profile).then((m) => setMatches(m.slice(0, 4)));
+    getSmartMatches(user.uid, profile).then((result) => {
+      const matchList = result.matches || result;
+      setMatches(Array.isArray(matchList) ? matchList.slice(0, 4) : []);
+    });
   }, [user, profile]);
 
   if (loading || !profile) {
