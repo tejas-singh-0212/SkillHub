@@ -62,8 +62,13 @@ export async function signInWithGoogle() {
   const result = await signInWithPopup(auth, provider);
 
   const userDoc = await getDoc(doc(db, "users", result.user.uid));
+  let isNewUser = false;
+  let onboardingComplete = false;
 
   if (!userDoc.exists()) {
+    isNewUser = true;
+    onboardingComplete = false;
+
     await setDoc(doc(db, "users", result.user.uid), {
       name: result.user.displayName || "",
       email: result.user.email || "",
@@ -83,9 +88,15 @@ export async function signInWithGoogle() {
       onboardingComplete: false,
       createdAt: serverTimestamp(),
     });
+  } else {
+    onboardingComplete = userDoc.data()?.onboardingComplete || false;
   }
 
-  return result.user;
+  return {
+    user: result.user,
+    isNewUser,
+    onboardingComplete,
+  };
 }
 
 export async function logOut() {
