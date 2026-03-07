@@ -10,6 +10,7 @@ import {
   onSnapshot,
   serverTimestamp,
   getDoc,
+  increment,
 } from "firebase/firestore";
 import { db } from "./firebase";
 
@@ -54,17 +55,14 @@ export async function sendMessage(convoId, senderId, content) {
     createdAt: serverTimestamp(),
   });
 
-  
   const convoSnap = await getDoc(doc(db, "conversations", convoId));
   const convoData = convoSnap.data();
   const otherUserId = convoData.participants.find((p) => p !== senderId);
 
-
   await updateDoc(doc(db, "conversations", convoId), {
     lastMessage: content,
     lastMessageTime: serverTimestamp(),
-    [`unreadCount.${otherUserId}`]:
-      (convoData.unreadCount?.[otherUserId] || 0) + 1,
+    [`unreadCount.${otherUserId}`]: increment(1),
   });
 }
 
