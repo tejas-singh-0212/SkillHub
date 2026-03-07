@@ -19,8 +19,8 @@ export default function HomePage() {
               <span className="text-yellow-300">Build Community</span>
             </h1>
             <p className="text-xl md:text-2xl text-blue-100 mb-8 leading-relaxed">
-              Offer your talents. Learn something new. Barter, pay, or share for
-              free, all within your local neighborhood.
+              Offer your talents. Learn something new. 
+              Barter, pay, or share for free, all within your local neighborhood.
             </p>
             <div className="flex flex-wrap gap-4">
               {!loading && !user ? (
@@ -80,7 +80,7 @@ export default function HomePage() {
               {
                 icon: "🤝",
                 title: "Connect & Exchange",
-                desc: "Book sessions, chat directly, barter or pay — your choice.",
+                desc: "Book sessions, chat directly, barter or pay, your choice.",
               },
             ].map((item, i) => (
               <div key={i} className="text-center">
@@ -102,7 +102,7 @@ export default function HomePage() {
             Skills You Can Exchange
           </h2>
           <p className="text-gray-600 text-center mb-12 text-lg">
-            From tutoring to home repairs — find it all nearby
+            From tutoring to home repairs, find everything nearby
           </p>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {SKILL_CATEGORIES.map((cat) => (
@@ -138,7 +138,7 @@ export default function HomePage() {
               {
                 icon: "🔄",
                 title: "Barter",
-                desc: "\"I'll teach guitar if you teach me cooking\"",
+                desc: "Trade your skills with others without any money involved",
                 color: "bg-blue-50 border-blue-200",
               },
               {
@@ -166,7 +166,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             {[
-              { number: "12+", label: "Skill Categories" },
+              { number: "12", label: "Skill Categories" },
               { number: "3", label: "Exchange Modes" },
               { number: "₹0", label: "Platform Fee" },
               { number: "∞", label: "Possibilities" },
