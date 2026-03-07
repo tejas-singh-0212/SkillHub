@@ -1,5 +1,3 @@
-// src/app/messages/page.jsx
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -8,8 +6,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { listenToConversations, markAsRead } from "@/lib/messages";
 import ConversationList from "@/components/ConversationList";
 import ChatWindow from "@/components/ChatWindow";
+import { Suspense } from "react";
 
-export default function MessagesPage() {
+function MessagesContent() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -22,14 +21,12 @@ export default function MessagesPage() {
     if (!authLoading && !user) router.push("/login");
   }, [authLoading, user, router]);
 
-  // Listen to conversations
   useEffect(() => {
     if (!user) return;
 
     const unsub = listenToConversations(user.uid, (convos) => {
       setConversations(convos);
 
-      // Auto-select from URL param
       const convoParam = searchParams.get("convo");
       if (convoParam && !selectedConvo) {
         const found = convos.find((c) => c.id === convoParam);
@@ -47,7 +44,6 @@ export default function MessagesPage() {
     setSelectedConvo(convo);
     setMobileShowChat(true);
 
-    // Mark as read
     if (user && convo.unreadCount?.[user.uid] > 0) {
       await markAsRead(convo.id, user.uid);
     }
@@ -132,5 +128,12 @@ export default function MessagesPage() {
         </div>
       </div>
     </div>
+  );
+}
+export default function MessagesPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading messages...</div>}>
+      <MessagesContent />
+    </Suspense>
   );
 }

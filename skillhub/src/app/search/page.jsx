@@ -1,5 +1,3 @@
-// src/app/search/page.jsx
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -11,6 +9,7 @@ import { useAuth } from "@/components/AuthProvider";
 import UserCard from "@/components/UserCard";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
+import { Suspense } from "react";
 
 const DynamicMap = dynamic(() => import("@/components/Map/DynamicMap"), {
   ssr: false,
@@ -21,7 +20,7 @@ const DynamicMap = dynamic(() => import("@/components/Map/DynamicMap"), {
   ),
 });
 
-export default function SearchPage() {
+function SearchContent() {
   const { user } = useAuth();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -39,7 +38,6 @@ export default function SearchPage() {
   const [radius, setRadius] = useState(25);
   const [priceType, setPriceType] = useState("");
 
-  // Auto-detect location on page load
   useEffect(() => {
     getCurrentLocation()
       .then((loc) => setUserLocation(loc))
@@ -48,7 +46,6 @@ export default function SearchPage() {
       });
   }, []);
 
-  // Auto-search if category is in URL
   useEffect(() => {
     if (category && userLocation) {
       handleSearch();
@@ -72,10 +69,8 @@ export default function SearchPage() {
         );
       }
 
-      // Also do text search if query provided
       if (queryText.trim()) {
         const textResults = await searchBySkillName(queryText);
-        // Merge results, avoid duplicates
         for (const tr of textResults) {
           if (!data.find((d) => d.id === tr.id)) {
             data.push(tr);
@@ -83,7 +78,6 @@ export default function SearchPage() {
         }
       }
 
-      // Filter out current user from results
       if (user) {
         data = data.filter((d) => d.id !== user.uid);
       }
@@ -96,7 +90,6 @@ export default function SearchPage() {
     }
   };
 
-  // Prepare results for map
   const mapResults = results
     .filter((r) => r.location?.latitude && r.location?.longitude)
     .map((r) => ({
@@ -294,5 +287,12 @@ export default function SearchPage() {
         </div>
       )}
     </div>
+  );
+}
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading search...</div>}>
+      <SearchContent />
+    </Suspense>
   );
 }
