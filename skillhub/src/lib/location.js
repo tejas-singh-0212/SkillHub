@@ -1,3 +1,51 @@
+// Normalize location data
+// Converts between different formats used across the app
+export function toClientLocation(firestoreLocation) {
+  if (!firestoreLocation) return null;
+
+  return {
+    lat: firestoreLocation.latitude || firestoreLocation.lat,
+    lng: firestoreLocation.longitude || firestoreLocation.lng,
+    city: firestoreLocation.city || "",
+    area: firestoreLocation.area || "",
+    fullAddress: firestoreLocation.fullAddress || "",
+  };
+}
+
+// Convert Client format → Firestore format
+// Used before saving to Firestore
+export function toFirestoreLocation(clientLocation) {
+  if (!clientLocation) return null;
+
+  return {
+    lat: clientLocation.lat || clientLocation.latitude,
+    lng: clientLocation.lng || clientLocation.longitude,
+    city: clientLocation.city || "",
+    area: clientLocation.area || "",
+    fullAddress: clientLocation.fullAddress || "",
+  };
+}
+
+// Format location for display
+export function formatLocationDisplay(location) {
+  if (!location) return "Location not set";
+
+  const area = location.area || location.suburb || "";
+  const city = location.city || location.town || "";
+
+  if (area && city) return `${area}, ${city}`;
+  if (city) return city;
+  if (area) return area;
+
+  const lat = location.lat || location.latitude;
+  const lng = location.lng || location.longitude;
+
+  if (lat && lng) return `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+
+  return "Location not set";
+}
+
+// Get current location using browser API
 export function getCurrentLocation() {
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) {
@@ -53,6 +101,7 @@ export function getCurrentLocation() {
   });
 }
 
+// Search for address using Nominatim
 export async function searchAddress(query) {
   if (!query || query.length < 3) return [];
 

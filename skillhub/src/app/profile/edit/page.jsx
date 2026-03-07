@@ -1,5 +1,3 @@
-// src/app/profile/edit/page.jsx
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -16,7 +14,7 @@ import {
   PROFICIENCY_LEVELS,
   PRICE_TYPES,
 } from "@/lib/users";
-import { getCurrentLocation } from "@/lib/location";
+import { getCurrentLocation, toClientLocation, formatLocationDisplay } from "@/lib/location";
 import dynamic from "next/dynamic";
 
 const LocationPicker = dynamic(
@@ -71,13 +69,9 @@ export default function ProfileEditPage() {
       setName(profile.name || "");
       setBio(profile.bio || "");
       setPhone(profile.phone || "");
+      // FIXED: Use helper to convert Firestore location to client format
       if (profile.location) {
-        setLocation({
-          lat: profile.location.latitude,
-          lng: profile.location.longitude,
-          city: profile.location.city,
-          area: profile.location.area,
-        });
+        setLocation(toClientLocation(profile.location));
       }
     }
   }, [profile]);
@@ -86,6 +80,7 @@ export default function ProfileEditPage() {
     setSaving(true);
     try {
       await updateProfile(user.uid, { name, bio, phone });
+      // FIXED: Pass location directly — updateLocation handles conversion
       if (location) {
         await updateLocation(user.uid, location);
       }
@@ -182,7 +177,6 @@ export default function ProfileEditPage() {
       {/* Basic Info */}
       <div className="bg-white rounded-2xl border p-6 mb-6">
         <h2 className="text-lg font-bold mb-4">👤 Basic Information</h2>
-
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium mb-1">Full Name</label>
@@ -193,7 +187,6 @@ export default function ProfileEditPage() {
               className="w-full border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-
           <div>
             <label className="block text-sm font-medium mb-1">Bio</label>
             <textarea
@@ -203,7 +196,6 @@ export default function ProfileEditPage() {
               className="w-full border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 resize-none"
             />
           </div>
-
           <div>
             <label className="block text-sm font-medium mb-1">Phone</label>
             <input
@@ -219,7 +211,6 @@ export default function ProfileEditPage() {
       {/* Location */}
       <div className="bg-white rounded-2xl border p-6 mb-6">
         <h2 className="text-lg font-bold mb-4">📍 Location</h2>
-
         <button
           onClick={handleAutoDetect}
           disabled={detectingLocation}
@@ -228,20 +219,21 @@ export default function ProfileEditPage() {
           {detectingLocation ? "Detecting..." : "📍 Auto-Detect Location"}
         </button>
 
+        {/* FIXED: Always pass { lat, lng } format */}
         <LocationPicker
           onLocationSelect={(loc) => setLocation(loc)}
           initialLocation={location}
         />
 
+        {/* FIXED: Use helper for display */}
         {location && (
           <p className="text-sm text-green-600 mt-2">
-            ✅ {location.area ? `${location.area}, ` : ""}
-            {location.city || "Location set"}
+            {formatLocationDisplay(location)}
           </p>
         )}
       </div>
 
-      {/* Save Basic Info Button */}
+      {/* Save Button */}
       <button
         onClick={handleSaveBasic}
         disabled={saving}
@@ -253,7 +245,6 @@ export default function ProfileEditPage() {
       {/* Skills Offered */}
       <div className="bg-white rounded-2xl border p-6 mb-6">
         <h2 className="text-lg font-bold mb-4">🎯 Skills Offered</h2>
-
         <div className="space-y-3 mb-4">
           {profile.skillsOffered?.map((skill, i) => (
             <div
@@ -380,7 +371,6 @@ export default function ProfileEditPage() {
       {/* Skills Needed */}
       <div className="bg-white rounded-2xl border p-6 mb-6">
         <h2 className="text-lg font-bold mb-4">🔍 Skills Needed</h2>
-
         <div className="space-y-3 mb-4">
           {profile.skillsNeeded?.map((skill, i) => (
             <div

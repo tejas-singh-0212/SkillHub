@@ -1,6 +1,6 @@
 "use client";
-
 import { useRouter } from "next/navigation";
+import { formatLocationDisplay } from "@/lib/location";
 
 export default function UserCard({ user }) {
   const router = useRouter();
@@ -23,12 +23,11 @@ export default function UserCard({ user }) {
         />
         <div>
           <h3 className="font-bold">{user.name}</h3>
+          {/* FIXED: Consistent location display */}
           <p className="text-sm text-gray-500">
             {user.distance !== undefined
               ? `📍 ${user.distance} km away`
-              : user.location?.city
-              ? `📍 ${user.location.area ? user.location.area + ", " : ""}${user.location.city}`
-              : "📍 Location not set"}
+              : `📍 ${formatLocationDisplay(user.location)}`}
           </p>
         </div>
       </div>

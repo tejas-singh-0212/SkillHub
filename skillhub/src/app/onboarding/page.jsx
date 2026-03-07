@@ -1,5 +1,3 @@
-// src/app/onboarding/page.jsx
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -15,7 +13,7 @@ import {
   PROFICIENCY_LEVELS,
   PRICE_TYPES,
 } from "@/lib/users";
-import { getCurrentLocation } from "@/lib/location";
+import { getCurrentLocation, toClientLocation, formatLocationDisplay } from "@/lib/location";
 import dynamic from "next/dynamic";
 
 const LocationPicker = dynamic(
@@ -69,7 +67,10 @@ export default function OnboardingPage() {
       setName(profile.name || "");
       setBio(profile.bio || "");
       setPhone(profile.phone || "");
-      if (profile.location) setLocation(profile.location);
+      // FIXED: Use helper to convert Firestore location to client format
+      if (profile.location) {
+        setLocation(toClientLocation(profile.location));
+      }
       if (profile.onboardingComplete) router.push("/dashboard");
     }
   }, [profile, router]);
@@ -92,13 +93,8 @@ export default function OnboardingPage() {
     setDetectingLocation(true);
     try {
       const loc = await getCurrentLocation();
-      setLocation({
-        lat: loc.lat,
-        lng: loc.lng,
-        city: loc.city,
-        area: loc.area,
-        fullAddress: loc.fullAddress,
-      });
+      // getCurrentLocation already returns { lat, lng, city, area, fullAddress }
+      setLocation(loc);
     } catch (err) {
       alert(
         "Could not detect location. Please pick on the map or allow location access."
@@ -135,6 +131,7 @@ export default function OnboardingPage() {
     try {
       await updateProfile(user.uid, { name, bio, phone });
 
+      // FIXED: Pass location directly — updateLocation handles conversion
       if (location) {
         await updateLocation(user.uid, location);
       }
@@ -271,13 +268,10 @@ export default function OnboardingPage() {
                 — or pick on the map —
               </div>
 
+              {/* FIXED: Always pass { lat, lng } format */}
               <LocationPicker
                 onLocationSelect={(loc) => setLocation(loc)}
-                initialLocation={
-                  location
-                    ? { lat: location.lat || location.latitude, lng: location.lng || location.longitude }
-                    : null
-                }
+                initialLocation={location}
               />
 
               {location && (
@@ -285,10 +279,9 @@ export default function OnboardingPage() {
                   <p className="text-green-700 font-medium">
                     ✅ Location set!
                   </p>
+                  {/* FIXED: Use helper for display */}
                   <p className="text-green-600 text-sm mt-1">
-                    {location.area && `${location.area}, `}
-                    {location.city ||
-                      `${(location.lat || location.latitude)?.toFixed(4)}, ${(location.lng || location.longitude)?.toFixed(4)}`}
+                    {formatLocationDisplay(location)}
                   </p>
                 </div>
               )}
@@ -311,7 +304,7 @@ export default function OnboardingPage() {
             </div>
           )}
 
-          {/* STEP 3 */}
+          {/* STEP 3 — Same as before (no location changes needed) */}
           {step === 3 && (
             <div className="space-y-5">
               <h2 className="text-xl font-bold">🎯 Skills You Offer</h2>
@@ -501,7 +494,7 @@ export default function OnboardingPage() {
             </div>
           )}
 
-          {/* STEP 4 */}
+          {/* STEP 4 — Same as before (no location changes needed) */}
           {step === 4 && (
             <div className="space-y-5">
               <h2 className="text-xl font-bold">🔍 Skills You Need</h2>

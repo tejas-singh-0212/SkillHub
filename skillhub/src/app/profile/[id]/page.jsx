@@ -1,5 +1,3 @@
-// src/app/profile/[id]/page.jsx
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -12,6 +10,7 @@ import SkillCard from "@/components/SkillCard";
 import BookingModal from "@/components/BookingModal";
 import ReviewList from "@/components/ReviewList";
 import { SKILL_CATEGORIES } from "@/lib/users";
+import { formatLocationDisplay } from "@/lib/location";
 
 export default function ProfilePage() {
   const params = useParams();
@@ -125,13 +124,7 @@ export default function ProfilePage() {
 
             <div className="flex flex-wrap gap-4 text-sm text-gray-500 mb-4">
               {profileData.location && (
-                <span>
-                  📍{" "}
-                  {profileData.location.area
-                    ? `${profileData.location.area}, `
-                    : ""}
-                  {profileData.location.city || "Location set"}
-                </span>
+                <span>📍 {formatLocationDisplay(profileData.location)}</span>
               )}
               <span>
                 ⭐ {profileData.averageRating || "New"}{" "}
