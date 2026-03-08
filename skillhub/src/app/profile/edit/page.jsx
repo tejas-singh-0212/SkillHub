@@ -19,7 +19,7 @@ import {
 } from "@/lib/users";
 import { getCurrentLocation, toClientLocation, formatLocationDisplay } from "@/lib/location";
 import dynamic from "next/dynamic";
-import { ProfileEditSkeleton } from "@/components/Skeletons";
+import toast from "react-hot-toast";
 
 const LocationPicker = dynamic(
   () => import("@/components/Map/LocationPicker"),
@@ -38,8 +38,7 @@ export default function ProfileEditPage() {
   const router = useRouter();
 
   const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
-
+  
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
   const [phone, setPhone] = useState("");
@@ -110,10 +109,9 @@ export default function ProfileEditPage() {
         await updateLocation(user.uid, location);
       }
       await refreshProfile();
-      setSaved(true);
-      setTimeout(() => setSaved(false), 3000);
+      toast.success("Profile updated successfully!"); 
     } catch (err) {
-      alert("Error saving: " + err.message);
+      toast.error("Error saving: " + err.message);
     } finally {
       setSaving(false);
     }
@@ -124,8 +122,9 @@ export default function ProfileEditPage() {
     try {
       const loc = await getCurrentLocation();
       setLocation(loc);
+      toast.success("Location detected!"); 
     } catch {
-      alert("Could not detect location.");
+      toast.error("Could not detect location. Please check browser permissions."); 
     } finally {
       setDetectingLocation(false);
     }
@@ -147,8 +146,9 @@ export default function ProfileEditPage() {
         perUnit: "hour",
       });
       setShowAddOffered(false);
+      toast.success("Skill added!");
     } catch (err) {
-      alert("Error adding skill: " + err.message);
+      toast.error("Error adding skill: " + err.message);
     }
   };
 
@@ -157,12 +157,12 @@ export default function ProfileEditPage() {
     try {
       await removeSkillOffered(user.uid, skill);
       await refreshProfile();
+      toast.success("Skill removed");
     } catch (err) {
-      alert("Error removing skill: " + err.message);
+      toast.error("Error removing skill: " + err.message); 
     }
   };
 
-  // Start editing an offered skill
   const handleStartEditOffered = (skill) => {
     setEditingOffered(skill.id);
     setEditOfferedData({
@@ -174,19 +174,18 @@ export default function ProfileEditPage() {
       price: skill.price || 0,
       perUnit: skill.perUnit || "hour",
     });
-    // Close add form if open
     setShowAddOffered(false);
   };
 
-  // Save edited offered skill
   const handleSaveEditOffered = async () => {
     if (!editOfferedData.name || !editOfferedData.category) return;
     try {
       await updateSkillOffered(user.uid, editingOffered, editOfferedData);
       await refreshProfile();
       setEditingOffered(null);
+      toast.success("Skill updated!"); 
     } catch (err) {
-      alert("Error updating skill: " + err.message);
+      toast.error("Error updating skill: " + err.message); 
     }
   };
 
@@ -198,8 +197,9 @@ export default function ProfileEditPage() {
       await refreshProfile();
       setNewNeeded({ name: "", category: "", description: "" });
       setShowAddNeeded(false);
+      toast.success("Skill added!");
     } catch (err) {
-      alert("Error adding skill: " + err.message);
+      toast.error("Error adding skill: " + err.message); 
     }
   };
 
@@ -208,12 +208,12 @@ export default function ProfileEditPage() {
     try {
       await removeSkillNeeded(user.uid, skill);
       await refreshProfile();
+      toast.success("Skill removed"); 
     } catch (err) {
-      alert("Error removing skill: " + err.message);
+      toast.error("Error removing skill: " + err.message); 
     }
   };
 
-  // Start editing a needed skill
   const handleStartEditNeeded = (skill) => {
     setEditingNeeded(skill.id);
     setEditNeededData({
@@ -224,31 +224,29 @@ export default function ProfileEditPage() {
     setShowAddNeeded(false);
   };
 
-  // Save edited needed skill
   const handleSaveEditNeeded = async () => {
     if (!editNeededData.name || !editNeededData.category) return;
     try {
       await updateSkillNeeded(user.uid, editingNeeded, editNeededData);
       await refreshProfile();
       setEditingNeeded(null);
+      toast.success("Skill updated!"); 
     } catch (err) {
-      alert("Error updating skill: " + err.message);
+      toast.error("Error updating skill: " + err.message); 
     }
   };
 
   if (authLoading || !profile) {
-    return <ProfileEditSkeleton />;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Loading...
+      </div>
+    );
   }
 
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8">
       <h1 className="text-3xl font-bold mb-8">⚙️ Edit Profile</h1>
-
-      {saved && (
-        <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
-          <p className="text-green-700 font-medium">✅ Profile saved!</p>
-        </div>
-      )}
 
       {/* Basic Info */}
       <div className="bg-white rounded-2xl border p-6 mb-6">
@@ -445,7 +443,7 @@ export default function ProfileEditPage() {
                       disabled={!editOfferedData.name || !editOfferedData.category}
                       className="flex-1 bg-blue-600 text-white py-2 rounded-lg disabled:opacity-50 hover:bg-blue-700"
                     >
-                      Save Changes
+                      💾 Save Changes
                     </button>
                   </div>
                 </div>
@@ -473,7 +471,7 @@ export default function ProfileEditPage() {
                       onClick={() => handleStartEditOffered(skill)}
                       className="text-blue-500 hover:text-blue-700 text-sm font-medium px-2 py-1 rounded-lg hover:bg-blue-100 transition"
                     >
-                      Edit
+                      ✏️ Edit
                     </button>
                     <button
                       onClick={() => handleRemoveOffered(skill)}
@@ -623,7 +621,7 @@ export default function ProfileEditPage() {
         <div className="space-y-3 mb-4">
           {profile.skillsNeeded?.map((skill, i) => (
             <div key={skill.id || i}>
-              {/*Edit Mode */}
+              {/* Edit Mode */}
               {editingNeeded === skill.id ? (
                 <div className="border-2 border-green-400 rounded-xl p-4 space-y-3 bg-green-50">
                   <div className="flex items-center justify-between mb-1">
@@ -677,7 +675,7 @@ export default function ProfileEditPage() {
                       disabled={!editNeededData.name || !editNeededData.category}
                       className="flex-1 bg-green-600 text-white py-2 rounded-lg disabled:opacity-50 hover:bg-green-700"
                     >
-                      Save Changes
+                      💾 Save Changes
                     </button>
                   </div>
                 </div>
@@ -698,7 +696,7 @@ export default function ProfileEditPage() {
                       onClick={() => handleStartEditNeeded(skill)}
                       className="text-green-500 hover:text-green-700 text-sm font-medium px-2 py-1 rounded-lg hover:bg-green-100 transition"
                     >
-                      Edit
+                      ✏️ Edit
                     </button>
                     <button
                       onClick={() => handleRemoveNeeded(skill)}

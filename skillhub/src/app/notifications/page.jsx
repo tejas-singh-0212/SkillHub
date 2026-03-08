@@ -146,8 +146,10 @@ export default function NotificationsPage() {
 
       {/* Notifications List */}
       {notifications.length === 0 ? (
-        <div className="text-center py-16">
-          <p className="text-5xl mb-4">🔔</p>
+        <div className="text-center py-20 animate-fade-in">
+          <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <p className="text-5xl opacity-80 cursor-default">🔔</p>
+          </div>
           <h3 className="text-xl font-bold mb-2">No notifications yet</h3>
           <p className="text-gray-600">
             When you receive bookings, messages, or reviews, they'll appear

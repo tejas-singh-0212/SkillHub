@@ -175,9 +175,11 @@ export default function ChatWindow({ conversationId }) {
         )}
 
         {messages.length === 0 && !loadingOlder && (
-          <div className="text-center text-gray-400 mt-10">
-            <p className="text-4xl mb-2">👋</p>
-            <p>Start the conversation!</p>
+          <div className="text-center text-gray-400 mt-20 animate-fade-in">
+            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <p className="text-4xl opacity-80 cursor-default">👋</p>
+            </div>
+            <p className="font-medium">Start the conversation!</p>
           </div>
         )}
 

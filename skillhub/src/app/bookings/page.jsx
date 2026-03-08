@@ -12,6 +12,7 @@ import { hasReviewedBooking } from "@/lib/reviews";
 import { createConversation } from "@/lib/messages";
 import ReviewForm from "@/components/ReviewForm";
 import { BookingsSkeleton } from "@/components/Skeletons";
+import toast from "react-hot-toast";
 
 export default function BookingsPage() {
   const { user, profile, loading: authLoading } = useAuth();
@@ -74,35 +75,44 @@ export default function BookingsPage() {
     checkReviews();
   }, [receivedBookings, sentBookings, user]);
 
+  // Action Handlers (Now with Toasts!)
+
   const handleAccept = async (bookingId) => {
     try {
       await updateBookingStatus(bookingId, "accepted");
+      toast.success("Booking accepted! 🎉");
     } catch (err) {
-      alert("Error: " + err.message);
+      toast.error("Failed to accept booking: " + err.message);
     }
   };
 
   const handleDecline = async (bookingId) => {
+    if (!confirm("Are you sure you want to decline this request?")) return;
     try {
       await updateBookingStatus(bookingId, "declined");
+      toast.success("Booking declined.");
     } catch (err) {
-      alert("Error: " + err.message);
+      toast.error("Failed to decline booking: " + err.message);
     }
   };
 
   const handleComplete = async (bookingId) => {
+    if (!confirm("Mark this session as completed?")) return;
     try {
       await updateBookingStatus(bookingId, "completed");
+      toast.success("Session completed! ⭐");
     } catch (err) {
-      alert("Error: " + err.message);
+      toast.error("Failed to complete booking: " + err.message);
     }
   };
 
   const handleCancel = async (bookingId) => {
+    if (!confirm("Are you sure you want to cancel your request?")) return;
     try {
       await updateBookingStatus(bookingId, "cancelled");
+      toast.success("Booking cancelled.");
     } catch (err) {
-      alert("Error: " + err.message);
+      toast.error("Failed to cancel booking: " + err.message);
     }
   };
 
@@ -115,7 +125,7 @@ export default function BookingsPage() {
       );
       router.push(`/messages?convo=${convoId}`);
     } catch (err) {
-      alert("Error: " + err.message);
+      toast.error("Error starting chat: " + err.message);
     }
   };
 
@@ -175,8 +185,10 @@ export default function BookingsPage() {
 
       {/* Bookings List */}
       {currentBookings.length === 0 ? (
-        <div className="text-center py-16">
-          <p className="text-5xl mb-4">📅</p>
+         <div className="text-center py-20 animate-fade-in">
+          <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <p className="text-5xl opacity-80 cursor-default">📅</p>
+          </div>
           <h3 className="text-xl font-bold mb-2">No bookings yet</h3>
           <p className="text-gray-600 mb-4">
             {tab === "received"
@@ -230,13 +242,13 @@ export default function BookingsPage() {
                         ⏱️ {booking.duration} min
                       </span>
                     </div>
-                      <p className="text-sm mt-1">
-                        {booking.paymentType === "free"
-                          ? "🆓 Free"
-                          : booking.paymentType === "barter"
-                          ? `🔄 Barter: ${booking.barterExchange}`
-                          : `💰 ₹${booking.amount} (${booking.duration} min session)`}
-                      </p>
+                    <p className="text-sm mt-1">
+                      {booking.paymentType === "free"
+                        ? "🆓 Free"
+                        : booking.paymentType === "barter"
+                        ? `🔄 Barter: ${booking.barterExchange}`
+                        : `💰 ₹${booking.amount} (${booking.duration} min session)`}
+                    </p>
                     {booking.message && (
                       <p className="text-sm text-gray-500 mt-1 italic">
                         &quot;{booking.message}&quot;
@@ -281,7 +293,7 @@ export default function BookingsPage() {
                       onClick={() => handleComplete(booking.id)}
                       className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700"
                     >
-                      ✅ Complete
+                      Complete
                     </button>
                   )}
 
@@ -299,7 +311,7 @@ export default function BookingsPage() {
                   {booking.status === "completed" &&
                     reviewedBookings[booking.id] && (
                       <span className="text-green-600 text-sm py-2">
-                        ✅ Reviewed
+                        Reviewed
                       </span>
                     )}
 

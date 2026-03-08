@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { submitReview } from "@/lib/reviews";
 import { useAuth } from "./AuthProvider";
+import toast from "react-hot-toast";
 
 export default function ReviewForm({ bookingId, revieweeId, onComplete }) {
   const { user, profile } = useAuth();
@@ -13,7 +14,10 @@ export default function ReviewForm({ bookingId, revieweeId, onComplete }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (rating === 0) return;
+    if (rating === 0) {
+      toast.error("Please select a rating to continue.");
+      return;
+    }
 
     setLoading(true);
     try {
@@ -26,9 +30,12 @@ export default function ReviewForm({ bookingId, revieweeId, onComplete }) {
         rating,
         comment,
       });
+      
+      toast.success("Review submitted successfully! ⭐");
       if (onComplete) onComplete();
+      
     } catch (err) {
-      alert("Error submitting review: " + err.message);
+      toast.error("Error submitting review: " + err.message);
     } finally {
       setLoading(false);
     }
@@ -46,7 +53,7 @@ export default function ReviewForm({ bookingId, revieweeId, onComplete }) {
               onClick={() => setRating(star)}
               onMouseEnter={() => setHoverRating(star)}
               onMouseLeave={() => setHoverRating(0)}
-              className="text-3xl transition"
+              className="text-3xl transition transform hover:scale-110"
             >
               {star <= (hoverRating || rating) ? "⭐" : "☆"}
             </button>
@@ -63,16 +70,22 @@ export default function ReviewForm({ bookingId, revieweeId, onComplete }) {
           onChange={(e) => setComment(e.target.value)}
           placeholder="How was your experience?"
           rows={3}
-          className="w-full border rounded-lg px-4 py-2 resize-none outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full border rounded-lg px-4 py-2 resize-none outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
         />
       </div>
 
       <button
         type="submit"
-        disabled={rating === 0 || loading}
-        className="w-full bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 transition"
+        disabled={loading} 
+        className="w-full bg-blue-600 text-white py-3 rounded-xl font-medium hover:bg-blue-700 disabled:opacity-50 transition shadow-sm hover:shadow"
       >
-        {loading ? "Submitting..." : "Submit Review"}
+        {loading ? (
+          <span className="flex items-center justify-center gap-2">
+            <span className="animate-spin">🔄</span> Submitting...
+          </span>
+        ) : (
+          "Submit Review"
+        )}
       </button>
     </form>
   );

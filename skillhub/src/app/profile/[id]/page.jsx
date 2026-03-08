@@ -85,7 +85,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 animate-fade-in">
       {/* Profile Header */}
       <div className="bg-white rounded-2xl border p-6 sm:p-8 mb-6">
         <div className="flex flex-col sm:flex-row items-start gap-6">

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { createBooking } from "@/lib/bookings";
 import { useAuth } from "./AuthProvider";
+import toast from "react-hot-toast"; 
 
 export default function BookingModal({ skill, provider, onClose }) {
   const { user, profile } = useAuth();
@@ -37,10 +38,13 @@ export default function BookingModal({ skill, provider, onClose }) {
         barterExchange: barterOffer,
         message,
       });
+      
       setSuccess(true);
+      toast.success("Booking request sent! 📨");
+      
       setTimeout(() => onClose(), 2000);
     } catch (err) {
-      alert("Error creating booking: " + err.message);
+      toast.error("Error creating booking: " + err.message);
     } finally {
       setLoading(false);
     }
@@ -49,7 +53,7 @@ export default function BookingModal({ skill, provider, onClose }) {
   if (success) {
     return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-2xl p-8 max-w-md w-full text-center">
+        <div className="bg-white rounded-2xl p-8 max-w-md w-full text-center animate-fade-in">
           <div className="text-6xl mb-4">✅</div>
           <h2 className="text-2xl font-bold mb-2">Booking Sent!</h2>
           <p className="text-gray-600">
@@ -62,7 +66,7 @@ export default function BookingModal({ skill, provider, onClose }) {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-2xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto animate-fade-in">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">📅 Book Session</h2>
           <button
@@ -76,6 +80,8 @@ export default function BookingModal({ skill, provider, onClose }) {
         <div className="bg-blue-50 rounded-lg p-3 mb-4">
           <p className="font-medium">{skill.name}</p>
           <p className="text-sm text-gray-600">with {provider.name}</p>
+          
+          {/* Pricing Info Display */}
           {skill.priceType === "paid" && (
             <p className="text-sm font-semibold text-orange-600 mt-1">
               💰 ₹{skill.price} {skill.perUnit === "hour" ? "per hour" : skill.perUnit === "session" ? "per session" : skill.perUnit === "day" ? "per day" : skill.perUnit}

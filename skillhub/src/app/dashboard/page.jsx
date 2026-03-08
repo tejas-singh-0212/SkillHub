@@ -46,7 +46,7 @@ export default function DashboardPage() {
   const completedBookings = bookings.filter((b) => b.status === "completed");
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 animate-fade-in">
       {/* Welcome */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-1">

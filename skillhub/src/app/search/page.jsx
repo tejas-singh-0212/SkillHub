@@ -139,7 +139,7 @@ function SearchContent() {
     }));
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 animate-fade-in">
       <h1 className="text-3xl font-bold mb-6">🔍 Find Skills Near You</h1>
 
       {/* Location Status */}

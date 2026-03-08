@@ -35,3 +35,18 @@ html {
 .leaflet-popup-content {
   margin: 12px !important;
 }
+/* UI Polish: Smooth Fade-ins */
+@keyframes fade-in {
+  0% { 
+    opacity: 0; 
+    transform: translateY(10px); 
+  }
+  100% { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}

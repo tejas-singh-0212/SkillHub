@@ -16,7 +16,7 @@ import {
 } from "@/lib/users";
 import { getCurrentLocation, toClientLocation, formatLocationDisplay } from "@/lib/location";
 import dynamic from "next/dynamic";
-import { OnboardingSkeleton } from "@/components/Skeletons";
+import toast from "react-hot-toast";
 
 const LocationPicker = dynamic(
   () => import("@/components/Map/LocationPicker"),
@@ -69,7 +69,6 @@ export default function OnboardingPage() {
       setName(profile.name || "");
       setBio(profile.bio || "");
       setPhone(profile.phone || "");
-      // FIXED: Use helper to convert Firestore location to client format
       if (profile.location) {
         setLocation(toClientLocation(profile.location));
       }
@@ -84,19 +83,21 @@ export default function OnboardingPage() {
   }, [authLoading, user, router]);
 
   if (authLoading) {
-    return <OnboardingSkeleton />;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-xl">Loading...</div>
+      </div>
+    );
   }
 
   const handleAutoDetectLocation = async () => {
     setDetectingLocation(true);
     try {
       const loc = await getCurrentLocation();
-      // getCurrentLocation already returns { lat, lng, city, area, fullAddress }
       setLocation(loc);
+      toast.success("Location detected successfully!");
     } catch (err) {
-      alert(
-        "Could not detect location. Please pick on the map or allow location access."
-      );
+      toast.error("Could not detect location. Please pick on the map."); 
     } finally {
       setDetectingLocation(false);
     }
@@ -115,6 +116,7 @@ export default function OnboardingPage() {
       perUnit: "hour",
     });
     setShowAddOffered(false);
+    toast.success("Skill added!");
   };
 
   const handleAddNeededSkill = () => {
@@ -122,6 +124,7 @@ export default function OnboardingPage() {
     setNeededSkills([...neededSkills, { ...newNeeded }]);
     setNewNeeded({ name: "", category: "", description: "" });
     setShowAddNeeded(false);
+    toast.success("Skill added!");
   };
 
   const handleFinish = async () => {
@@ -129,7 +132,6 @@ export default function OnboardingPage() {
     try {
       await updateProfile(user.uid, { name, bio, phone });
 
-      // FIXED: Pass location directly — updateLocation handles conversion
       if (location) {
         await updateLocation(user.uid, location);
       }
@@ -144,9 +146,11 @@ export default function OnboardingPage() {
 
       await completeOnboarding(user.uid);
       await refreshProfile();
+      
+      toast.success("Profile setup complete! Welcome to SkillHub 🚀");
       router.push("/dashboard");
     } catch (err) {
-      alert("Error saving profile: " + err.message);
+      toast.error("Error saving profile: " + err.message);
     } finally {
       setSaving(false);
     }
@@ -160,7 +164,8 @@ export default function OnboardingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
+    // Added animate-fade-in
+    <div className="min-h-screen bg-gray-50 py-8 px-4 animate-fade-in">
       <div className="max-w-2xl mx-auto">
         <h1 className="text-3xl font-bold text-center mb-2">
           Set Up Your Profile
@@ -194,7 +199,7 @@ export default function OnboardingPage() {
         <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8">
           {/* STEP 1 */}
           {step === 1 && (
-            <div className="space-y-5">
+            <div className="space-y-5 animate-fade-in">
               <h2 className="text-xl font-bold">👤 Basic Information</h2>
 
               <div>
@@ -246,7 +251,7 @@ export default function OnboardingPage() {
 
           {/* STEP 2 */}
           {step === 2 && (
-            <div className="space-y-5">
+            <div className="space-y-5 animate-fade-in">
               <h2 className="text-xl font-bold">📍 Your Location</h2>
               <p className="text-gray-600 text-sm">
                 This helps people find skills near them
@@ -257,16 +262,19 @@ export default function OnboardingPage() {
                 disabled={detectingLocation}
                 className="w-full border-2 border-dashed border-blue-300 rounded-xl py-4 text-blue-600 font-medium hover:bg-blue-50 transition disabled:opacity-50"
               >
-                {detectingLocation
-                  ? "📡 Detecting your location..."
-                  : "📍 Auto-Detect My Location"}
+                {detectingLocation ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <span className="animate-spin">🔄</span> Detecting your location...
+                  </span>
+                ) : (
+                  "📍 Auto-Detect My Location"
+                )}
               </button>
 
               <div className="text-center text-gray-400 text-sm">
-                — or pick on the map —
+                — or search / pick on the map —
               </div>
 
-              {/* FIXED: Always pass { lat, lng } format */}
               <LocationPicker
                 onLocationSelect={(loc) => setLocation(loc)}
                 initialLocation={location}
@@ -275,9 +283,8 @@ export default function OnboardingPage() {
               {location && (
                 <div className="bg-green-50 border border-green-200 rounded-xl p-4">
                   <p className="text-green-700 font-medium">
-                    ✅ Location set!
+                    Location set!
                   </p>
-                  {/* FIXED: Use helper for display */}
                   <p className="text-green-600 text-sm mt-1">
                     {formatLocationDisplay(location)}
                   </p>
@@ -292,8 +299,13 @@ export default function OnboardingPage() {
                   ← Back
                 </button>
                 <button
-                  onClick={() => setStep(3)}
-                  disabled={!location}
+                  onClick={() => {
+                    if (!location) {
+                      toast.error("Please select a location first!");
+                      return;
+                    }
+                    setStep(3);
+                  }}
                   className="flex-1 bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition disabled:opacity-50"
                 >
                   Next → Add Skills
@@ -302,9 +314,9 @@ export default function OnboardingPage() {
             </div>
           )}
 
-          {/* STEP 3 — Same as before (no location changes needed) */}
+          {/* STEP 3 */}
           {step === 3 && (
-            <div className="space-y-5">
+            <div className="space-y-5 animate-fade-in">
               <h2 className="text-xl font-bold">🎯 Skills You Offer</h2>
               <p className="text-gray-600 text-sm">
                 What can you teach, do, or help others with?
@@ -313,7 +325,7 @@ export default function OnboardingPage() {
               {offeredSkills.map((skill, index) => (
                 <div
                   key={index}
-                  className="flex items-start justify-between bg-blue-50 rounded-xl p-4"
+                  className="flex items-start justify-between bg-blue-50 rounded-xl p-4 animate-fade-in"
                 >
                   <div className="flex-1 min-w-0 mr-3">
                     <p className="font-semibold">{skill.name}</p>
@@ -334,9 +346,10 @@ export default function OnboardingPage() {
                     )}
                   </div>
                   <button
-                    onClick={() =>
-                      setOfferedSkills(offeredSkills.filter((_, i) => i !== index))
-                    }
+                    onClick={() => {
+                      setOfferedSkills(offeredSkills.filter((_, i) => i !== index));
+                      toast.success("Skill removed");
+                    }}
                     className="text-red-500 hover:text-red-700 text-xl shrink-0"
                   >
                     ✕
@@ -345,7 +358,7 @@ export default function OnboardingPage() {
               ))}
 
               {showAddOffered ? (
-                <div className="border-2 border-blue-200 rounded-xl p-4 space-y-3">
+                <div className="border-2 border-blue-200 rounded-xl p-4 space-y-3 animate-fade-in">
                   <input
                     type="text"
                     placeholder="Skill name (e.g., Guitar Lessons)"
@@ -389,7 +402,7 @@ export default function OnboardingPage() {
                   </select>
 
                   <textarea
-                    placeholder="Brief description (optional)"
+                    placeholder="Brief description — what exactly do you offer? (optional)"
                     value={newOffered.description}
                     onChange={(e) =>
                       setNewOffered({
@@ -398,7 +411,7 @@ export default function OnboardingPage() {
                       })
                     }
                     rows={2}
-                    className="w-full border rounded-lg px-4 py-2 resize-none outline-none"
+                    className="w-full border rounded-lg px-4 py-2 resize-none outline-none focus:ring-2 focus:ring-blue-500"
                   />
 
                   <div className="grid grid-cols-3 gap-2">
@@ -463,17 +476,17 @@ export default function OnboardingPage() {
                     </div>
                   )}
 
-                  <div className="flex gap-3">
+                  <div className="flex gap-3 pt-2">
                     <button
                       onClick={() => setShowAddOffered(false)}
-                      className="flex-1 border py-2 rounded-lg"
+                      className="flex-1 border py-2 rounded-lg hover:bg-gray-50 transition"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={handleAddOfferedSkill}
                       disabled={!newOffered.name || !newOffered.category}
-                      className="flex-1 bg-blue-600 text-white py-2 rounded-lg disabled:opacity-50"
+                      className="flex-1 bg-blue-600 text-white py-2 rounded-lg disabled:opacity-50 hover:bg-blue-700 transition"
                     >
                       Add Skill
                     </button>
@@ -482,22 +495,22 @@ export default function OnboardingPage() {
               ) : (
                 <button
                   onClick={() => setShowAddOffered(true)}
-                  className="w-full border-2 border-dashed border-gray-300 rounded-xl py-4 text-gray-600 font-medium hover:border-blue-400 hover:text-blue-600 transition"
+                  className="w-full border-2 border-dashed border-gray-300 rounded-xl py-4 text-gray-600 font-medium hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 transition"
                 >
                   + Add a Skill You Offer
                 </button>
               )}
 
-              <div className="flex gap-3">
+              <div className="flex gap-3 mt-6">
                 <button
                   onClick={() => setStep(2)}
-                  className="flex-1 border border-gray-300 py-3 rounded-xl font-medium hover:bg-gray-50"
+                  className="flex-1 border border-gray-300 py-3 rounded-xl font-medium hover:bg-gray-50 transition"
                 >
                   ← Back
                 </button>
                 <button
                   onClick={() => setStep(4)}
-                  className="flex-1 bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700"
+                  className="flex-1 bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition"
                 >
                   Next → Skills Needed
                 </button>
@@ -505,9 +518,9 @@ export default function OnboardingPage() {
             </div>
           )}
 
-          {/* STEP 4 — Same as before (no location changes needed) */}
+          {/* STEP 4 */}
           {step === 4 && (
-            <div className="space-y-5">
+            <div className="space-y-5 animate-fade-in">
               <h2 className="text-xl font-bold">🔍 Skills You Need</h2>
               <p className="text-gray-600 text-sm">
                 What do you want to learn or get help with?
@@ -516,7 +529,7 @@ export default function OnboardingPage() {
               {neededSkills.map((skill, index) => (
                 <div
                   key={index}
-                  className="flex items-start justify-between bg-green-50 rounded-xl p-4"
+                  className="flex items-start justify-between bg-green-50 rounded-xl p-4 animate-fade-in"
                 >
                   <div className="flex-1 min-w-0 mr-3">
                     <p className="font-semibold">{skill.name}</p>
@@ -531,9 +544,10 @@ export default function OnboardingPage() {
                     )}
                   </div>
                   <button
-                    onClick={() =>
-                      setNeededSkills(neededSkills.filter((_, i) => i !== index))
-                    }
+                    onClick={() => {
+                      setNeededSkills(neededSkills.filter((_, i) => i !== index));
+                      toast.success("Skill removed");
+                    }}
                     className="text-red-500 hover:text-red-700 text-xl shrink-0"
                   >
                     ✕
@@ -542,7 +556,7 @@ export default function OnboardingPage() {
               ))}
 
               {showAddNeeded ? (
-                <div className="border-2 border-green-200 rounded-xl p-4 space-y-3">
+                <div className="border-2 border-green-200 rounded-xl p-4 space-y-3 animate-fade-in">
                   <input
                     type="text"
                     placeholder="Skill you need (e.g., Web Development)"
@@ -566,8 +580,9 @@ export default function OnboardingPage() {
                       </option>
                     ))}
                   </select>
+                  
                   <textarea
-                    placeholder="What specifically do you need help with?"
+                    placeholder="What specifically do you need help with? (optional)"
                     value={newNeeded.description}
                     onChange={(e) =>
                       setNewNeeded({
@@ -576,19 +591,20 @@ export default function OnboardingPage() {
                       })
                     }
                     rows={2}
-                    className="w-full border rounded-lg px-4 py-2 resize-none outline-none"
+                    className="w-full border rounded-lg px-4 py-2 resize-none outline-none focus:ring-2 focus:ring-green-500"
                   />
-                  <div className="flex gap-3">
+                  
+                  <div className="flex gap-3 pt-2">
                     <button
                       onClick={() => setShowAddNeeded(false)}
-                      className="flex-1 border py-2 rounded-lg"
+                      className="flex-1 border py-2 rounded-lg hover:bg-gray-50 transition"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={handleAddNeededSkill}
                       disabled={!newNeeded.name || !newNeeded.category}
-                      className="flex-1 bg-green-600 text-white py-2 rounded-lg disabled:opacity-50"
+                      className="flex-1 bg-green-600 text-white py-2 rounded-lg disabled:opacity-50 hover:bg-green-700 transition"
                     >
                       Add Skill
                     </button>
@@ -597,16 +613,16 @@ export default function OnboardingPage() {
               ) : (
                 <button
                   onClick={() => setShowAddNeeded(true)}
-                  className="w-full border-2 border-dashed border-gray-300 rounded-xl py-4 text-gray-600 font-medium hover:border-green-400 hover:text-green-600 transition"
+                  className="w-full border-2 border-dashed border-gray-300 rounded-xl py-4 text-gray-600 font-medium hover:border-green-400 hover:text-green-600 hover:bg-green-50 transition"
                 >
                   + Add a Skill You Need
                 </button>
               )}
 
-              <div className="flex gap-3">
+              <div className="flex gap-3 mt-6">
                 <button
                   onClick={() => setStep(3)}
-                  className="flex-1 border border-gray-300 py-3 rounded-xl font-medium hover:bg-gray-50"
+                  className="flex-1 border border-gray-300 py-3 rounded-xl font-medium hover:bg-gray-50 transition"
                 >
                   ← Back
                 </button>
@@ -615,7 +631,13 @@ export default function OnboardingPage() {
                   disabled={saving}
                   className="flex-1 bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 transition disabled:opacity-50"
                 >
-                  {saving ? "Saving..." : "✅ Complete Setup"}
+                  {saving ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <span className="animate-spin">🔄</span> Saving...
+                    </span>
+                  ) : (
+                    "Complete Setup"
+                  )}
                 </button>
               </div>
             </div>
