@@ -10,6 +10,8 @@ import {
   addSkillNeeded,
   removeSkillOffered,
   removeSkillNeeded,
+  updateSkillOffered,
+  updateSkillNeeded,
   SKILL_CATEGORIES,
   PROFICIENCY_LEVELS,
   PRICE_TYPES,
@@ -43,6 +45,7 @@ export default function ProfileEditPage() {
   const [location, setLocation] = useState(null);
   const [detectingLocation, setDetectingLocation] = useState(false);
 
+  // Add Offered Skill
   const [showAddOffered, setShowAddOffered] = useState(false);
   const [newOffered, setNewOffered] = useState({
     name: "",
@@ -54,8 +57,29 @@ export default function ProfileEditPage() {
     perUnit: "hour",
   });
 
+  // Edit Offered Skill
+  const [editingOffered, setEditingOffered] = useState(null);
+  const [editOfferedData, setEditOfferedData] = useState({
+    name: "",
+    category: "",
+    level: "intermediate",
+    description: "",
+    priceType: "free",
+    price: 0,
+    perUnit: "hour",
+  });
+
+  // Add Needed Skill
   const [showAddNeeded, setShowAddNeeded] = useState(false);
   const [newNeeded, setNewNeeded] = useState({
+    name: "",
+    category: "",
+    description: "",
+  });
+
+  // Edit Needed Skill
+  const [editingNeeded, setEditingNeeded] = useState(null);
+  const [editNeededData, setEditNeededData] = useState({
     name: "",
     category: "",
     description: "",
@@ -70,18 +94,17 @@ export default function ProfileEditPage() {
       setName(profile.name || "");
       setBio(profile.bio || "");
       setPhone(profile.phone || "");
-      // FIXED: Use helper to convert Firestore location to client format
       if (profile.location) {
         setLocation(toClientLocation(profile.location));
       }
     }
   }, [profile]);
 
+  // Basic Info Handlers
   const handleSaveBasic = async () => {
     setSaving(true);
     try {
       await updateProfile(user.uid, { name, bio, phone });
-      // FIXED: Pass location directly — updateLocation handles conversion
       if (location) {
         await updateLocation(user.uid, location);
       }
@@ -107,6 +130,7 @@ export default function ProfileEditPage() {
     }
   };
 
+  // Offered Skill Handlers
   const handleAddOffered = async () => {
     if (!newOffered.name || !newOffered.category) return;
     try {
@@ -128,6 +152,7 @@ export default function ProfileEditPage() {
   };
 
   const handleRemoveOffered = async (skill) => {
+    if (!confirm(`Remove "${skill.name}" from your offered skills?`)) return;
     try {
       await removeSkillOffered(user.uid, skill);
       await refreshProfile();
@@ -136,6 +161,35 @@ export default function ProfileEditPage() {
     }
   };
 
+  // Start editing an offered skill
+  const handleStartEditOffered = (skill) => {
+    setEditingOffered(skill.id);
+    setEditOfferedData({
+      name: skill.name,
+      category: skill.category,
+      level: skill.level || "intermediate",
+      description: skill.description || "",
+      priceType: skill.priceType || "free",
+      price: skill.price || 0,
+      perUnit: skill.perUnit || "hour",
+    });
+    // Close add form if open
+    setShowAddOffered(false);
+  };
+
+  // Save edited offered skill
+  const handleSaveEditOffered = async () => {
+    if (!editOfferedData.name || !editOfferedData.category) return;
+    try {
+      await updateSkillOffered(user.uid, editingOffered, editOfferedData);
+      await refreshProfile();
+      setEditingOffered(null);
+    } catch (err) {
+      alert("Error updating skill: " + err.message);
+    }
+  };
+
+  // Needed Skill Handlers
   const handleAddNeeded = async () => {
     if (!newNeeded.name || !newNeeded.category) return;
     try {
@@ -149,11 +203,35 @@ export default function ProfileEditPage() {
   };
 
   const handleRemoveNeeded = async (skill) => {
+    if (!confirm(`Remove "${skill.name}" from your needed skills?`)) return;
     try {
       await removeSkillNeeded(user.uid, skill);
       await refreshProfile();
     } catch (err) {
       alert("Error removing skill: " + err.message);
+    }
+  };
+
+  // Start editing a needed skill
+  const handleStartEditNeeded = (skill) => {
+    setEditingNeeded(skill.id);
+    setEditNeededData({
+      name: skill.name,
+      category: skill.category,
+      description: skill.description || "",
+    });
+    setShowAddNeeded(false);
+  };
+
+  // Save edited needed skill
+  const handleSaveEditNeeded = async () => {
+    if (!editNeededData.name || !editNeededData.category) return;
+    try {
+      await updateSkillNeeded(user.uid, editingNeeded, editNeededData);
+      await refreshProfile();
+      setEditingNeeded(null);
+    } catch (err) {
+      alert("Error updating skill: " + err.message);
     }
   };
 
@@ -220,21 +298,19 @@ export default function ProfileEditPage() {
           {detectingLocation ? "Detecting..." : "📍 Auto-Detect Location"}
         </button>
 
-        {/* FIXED: Always pass { lat, lng } format */}
         <LocationPicker
           onLocationSelect={(loc) => setLocation(loc)}
           initialLocation={location}
         />
 
-        {/* FIXED: Use helper for display */}
         {location && (
           <p className="text-sm text-green-600 mt-2">
-            {formatLocationDisplay(location)}
+            ✅ {formatLocationDisplay(location)}
           </p>
         )}
       </div>
 
-      {/* Save Button */}
+      {/* Save Basic Info */}
       <button
         onClick={handleSaveBasic}
         disabled={saving}
@@ -246,37 +322,176 @@ export default function ProfileEditPage() {
       {/* Skills Offered */}
       <div className="bg-white rounded-2xl border p-6 mb-6">
         <h2 className="text-lg font-bold mb-4">🎯 Skills Offered</h2>
+
         <div className="space-y-3 mb-4">
           {profile.skillsOffered?.map((skill, i) => (
-            <div
-              key={i}
-              className="flex items-start justify-between bg-blue-50 rounded-xl p-4"
-            >
-              <div className="flex-1 min-w-0 mr-3">
-                <p className="font-semibold">{skill.name}</p>
-                <p className="text-sm text-gray-600">
-                  {skill.category} • {skill.level} •{" "}
-                  {skill.priceType === "free"
-                    ? "Free"
-                    : skill.priceType === "barter"
-                    ? "Barter"
-                    : `₹${skill.price} ${PER_UNIT_OPTIONS.find((o) => o.id === skill.perUnit)?.label || skill.perUnit}`}
-                </p>
-                {skill.description && (
-                  <p className="text-sm text-gray-500 mt-1 italic">
-                    "{skill.description}"
-                  </p>
-                )}
-              </div>
-              <button
-                onClick={() => handleRemoveOffered(skill)}
-                className="text-red-500 hover:text-red-700 text-lg shrink-0"
-              >
-                ✕
-              </button>
+            <div key={skill.id || i}>
+              {/* Edit Mode */}
+              {editingOffered === skill.id ? (
+                <div className="border-2 border-blue-400 rounded-xl p-4 space-y-3 bg-blue-50">
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="text-sm font-semibold text-blue-700">✏️ Editing Skill</p>
+                  </div>
+
+                  <input
+                    type="text"
+                    placeholder="Skill name"
+                    value={editOfferedData.name}
+                    onChange={(e) =>
+                      setEditOfferedData({ ...editOfferedData, name: e.target.value })
+                    }
+                    className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+
+                  <select
+                    value={editOfferedData.category}
+                    onChange={(e) =>
+                      setEditOfferedData({ ...editOfferedData, category: e.target.value })
+                    }
+                    className="w-full border rounded-lg px-4 py-2"
+                  >
+                    <option value="">Select Category</option>
+                    {SKILL_CATEGORIES.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.icon} {c.label}
+                      </option>
+                    ))}
+                  </select>
+
+                  <select
+                    value={editOfferedData.level}
+                    onChange={(e) =>
+                      setEditOfferedData({ ...editOfferedData, level: e.target.value })
+                    }
+                    className="w-full border rounded-lg px-4 py-2"
+                  >
+                    {PROFICIENCY_LEVELS.map((l) => (
+                      <option key={l.id} value={l.id}>
+                        {l.label}
+                      </option>
+                    ))}
+                  </select>
+
+                  <textarea
+                    placeholder="Brief description (optional)"
+                    value={editOfferedData.description}
+                    onChange={(e) =>
+                      setEditOfferedData({ ...editOfferedData, description: e.target.value })
+                    }
+                    rows={2}
+                    className="w-full border rounded-lg px-4 py-2 resize-none outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+
+                  <div className="grid grid-cols-3 gap-2">
+                    {PRICE_TYPES.map((pt) => (
+                      <button
+                        key={pt.id}
+                        type="button"
+                        onClick={() =>
+                          setEditOfferedData({ ...editOfferedData, priceType: pt.id })
+                        }
+                        className={`p-2 rounded-lg border-2 text-sm font-medium ${
+                          editOfferedData.priceType === pt.id
+                            ? "border-blue-500 bg-white"
+                            : "border-gray-200"
+                        }`}
+                      >
+                        {pt.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {editOfferedData.priceType === "paid" && (
+                    <div className="flex gap-3">
+                      <div className="flex-1">
+                        <input
+                          type="number"
+                          placeholder="Price (₹)"
+                          value={editOfferedData.price || ""}
+                          onChange={(e) =>
+                            setEditOfferedData({
+                              ...editOfferedData,
+                              price: parseInt(e.target.value) || 0,
+                            })
+                          }
+                          className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+                      <select
+                        value={editOfferedData.perUnit}
+                        onChange={(e) =>
+                          setEditOfferedData({
+                            ...editOfferedData,
+                            perUnit: e.target.value,
+                          })
+                        }
+                        className="border rounded-lg px-4 py-2"
+                      >
+                        {PER_UNIT_OPTIONS.map((opt) => (
+                          <option key={opt.id} value={opt.id}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => setEditingOffered(null)}
+                      className="flex-1 border py-2 rounded-lg hover:bg-gray-50"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleSaveEditOffered}
+                      disabled={!editOfferedData.name || !editOfferedData.category}
+                      className="flex-1 bg-blue-600 text-white py-2 rounded-lg disabled:opacity-50 hover:bg-blue-700"
+                    >
+                      Save Changes
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                /* Display Mode */
+                <div className="flex items-start justify-between bg-blue-50 rounded-xl p-4">
+                  <div className="flex-1 min-w-0 mr-3">
+                    <p className="font-semibold">{skill.name}</p>
+                    <p className="text-sm text-gray-600">
+                      {skill.category} • {skill.level} •{" "}
+                      {skill.priceType === "free"
+                        ? "Free"
+                        : skill.priceType === "barter"
+                        ? "Barter"
+                        : `₹${skill.price} ${PER_UNIT_OPTIONS.find((o) => o.id === skill.perUnit)?.label || skill.perUnit}`}
+                    </p>
+                    {skill.description && (
+                      <p className="text-sm text-gray-500 mt-1 italic">
+                        "{skill.description}"
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      onClick={() => handleStartEditOffered(skill)}
+                      className="text-blue-500 hover:text-blue-700 text-sm font-medium px-2 py-1 rounded-lg hover:bg-blue-100 transition"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleRemoveOffered(skill)}
+                      className="text-red-400 hover:text-red-600 text-lg"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           ))}
         </div>
+
+        {/* Add New Offered Skill */}
         {showAddOffered ? (
           <div className="border-2 border-blue-200 rounded-xl p-4 space-y-3">
             <input
@@ -316,15 +531,11 @@ export default function ProfileEditPage() {
               ))}
             </select>
 
-            {/*Description Field */}
             <textarea
               placeholder="Brief description — what exactly do you offer? (optional)"
               value={newOffered.description}
               onChange={(e) =>
-                setNewOffered({
-                  ...newOffered,
-                  description: e.target.value,
-                })
+                setNewOffered({ ...newOffered, description: e.target.value })
               }
               rows={2}
               className="w-full border rounded-lg px-4 py-2 resize-none outline-none focus:ring-2 focus:ring-blue-500"
@@ -367,10 +578,7 @@ export default function ProfileEditPage() {
                 <select
                   value={newOffered.perUnit}
                   onChange={(e) =>
-                    setNewOffered({
-                      ...newOffered,
-                      perUnit: e.target.value,
-                    })
+                    setNewOffered({ ...newOffered, perUnit: e.target.value })
                   }
                   className="border rounded-lg px-4 py-2"
                 >
@@ -400,7 +608,10 @@ export default function ProfileEditPage() {
           </div>
         ) : (
           <button
-            onClick={() => setShowAddOffered(true)}
+            onClick={() => {
+              setShowAddOffered(true);
+              setEditingOffered(null);
+            }}
             className="w-full border-2 border-dashed border-gray-300 rounded-xl py-3 text-gray-600 hover:border-blue-400 hover:text-blue-600 transition"
           >
             + Add Skill Offered
@@ -411,90 +622,159 @@ export default function ProfileEditPage() {
       {/* Skills Needed */}
       <div className="bg-white rounded-2xl border p-6 mb-6">
         <h2 className="text-lg font-bold mb-4">🔍 Skills Needed</h2>
+
         <div className="space-y-3 mb-4">
           {profile.skillsNeeded?.map((skill, i) => (
-            <div
-              key={i}
-              className="flex items-start justify-between bg-green-50 rounded-xl p-4"
-            >
-              <div className="flex-1 min-w-0 mr-3">
-                <p className="font-semibold">{skill.name}</p>
-                <p className="text-sm text-gray-600">{skill.category}</p>
-                {skill.description && (
-                  <p className="text-sm text-gray-500 mt-1 italic">
-                    "{skill.description}"
-                  </p>
-                )}
-              </div>
-              <button
-                onClick={() => handleRemoveNeeded(skill)}
-                className="text-red-500 hover:text-red-700 text-lg shrink-0"
-              >
-                ✕
-              </button>
+            <div key={skill.id || i}>
+              {/*Edit Mode */}
+              {editingNeeded === skill.id ? (
+                <div className="border-2 border-green-400 rounded-xl p-4 space-y-3 bg-green-50">
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="text-sm font-semibold text-green-700">✏️ Editing Skill</p>
+                  </div>
+
+                  <input
+                    type="text"
+                    placeholder="Skill you need"
+                    value={editNeededData.name}
+                    onChange={(e) =>
+                      setEditNeededData({ ...editNeededData, name: e.target.value })
+                    }
+                    className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-green-500"
+                  />
+
+                  <select
+                    value={editNeededData.category}
+                    onChange={(e) =>
+                      setEditNeededData({ ...editNeededData, category: e.target.value })
+                    }
+                    className="w-full border rounded-lg px-4 py-2"
+                  >
+                    <option value="">Select Category</option>
+                    {SKILL_CATEGORIES.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.icon} {c.label}
+                      </option>
+                    ))}
+                  </select>
+
+                  <textarea
+                    placeholder="What specifically do you need help with? (optional)"
+                    value={editNeededData.description}
+                    onChange={(e) =>
+                      setEditNeededData({ ...editNeededData, description: e.target.value })
+                    }
+                    rows={2}
+                    className="w-full border rounded-lg px-4 py-2 resize-none outline-none focus:ring-2 focus:ring-green-500"
+                  />
+
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => setEditingNeeded(null)}
+                      className="flex-1 border py-2 rounded-lg hover:bg-gray-50"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleSaveEditNeeded}
+                      disabled={!editNeededData.name || !editNeededData.category}
+                      className="flex-1 bg-green-600 text-white py-2 rounded-lg disabled:opacity-50 hover:bg-green-700"
+                    >
+                      Save Changes
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                /* Display Mode */
+                <div className="flex items-start justify-between bg-green-50 rounded-xl p-4">
+                  <div className="flex-1 min-w-0 mr-3">
+                    <p className="font-semibold">{skill.name}</p>
+                    <p className="text-sm text-gray-600">{skill.category}</p>
+                    {skill.description && (
+                      <p className="text-sm text-gray-500 mt-1 italic">
+                        "{skill.description}"
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      onClick={() => handleStartEditNeeded(skill)}
+                      className="text-green-500 hover:text-green-700 text-sm font-medium px-2 py-1 rounded-lg hover:bg-green-100 transition"
+                    >
+                      ✏️ Edit
+                    </button>
+                    <button
+                      onClick={() => handleRemoveNeeded(skill)}
+                      className="text-red-400 hover:text-red-600 text-lg"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           ))}
         </div>
-          {showAddNeeded ? (
-            <div className="border-2 border-green-200 rounded-xl p-4 space-y-3">
-              <input
-                type="text"
-                placeholder="Skill you need (e.g., Web Development)"
-                value={newNeeded.name}
-                onChange={(e) =>
-                  setNewNeeded({ ...newNeeded, name: e.target.value })
-                }
-                className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-green-500"
-              />
-              <select
-                value={newNeeded.category}
-                onChange={(e) =>
-                  setNewNeeded({ ...newNeeded, category: e.target.value })
-                }
-                className="w-full border rounded-lg px-4 py-2"
+
+        {/* Add New Needed Skill */}
+        {showAddNeeded ? (
+          <div className="border-2 border-green-200 rounded-xl p-4 space-y-3">
+            <input
+              type="text"
+              placeholder="Skill you need (e.g., Web Development)"
+              value={newNeeded.name}
+              onChange={(e) =>
+                setNewNeeded({ ...newNeeded, name: e.target.value })
+              }
+              className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-green-500"
+            />
+            <select
+              value={newNeeded.category}
+              onChange={(e) =>
+                setNewNeeded({ ...newNeeded, category: e.target.value })
+              }
+              className="w-full border rounded-lg px-4 py-2"
+            >
+              <option value="">Select Category</option>
+              {SKILL_CATEGORIES.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.icon} {c.label}
+                </option>
+              ))}
+            </select>
+
+            <textarea
+              placeholder="What specifically do you need help with? (optional)"
+              value={newNeeded.description}
+              onChange={(e) =>
+                setNewNeeded({ ...newNeeded, description: e.target.value })
+              }
+              rows={2}
+              className="w-full border rounded-lg px-4 py-2 resize-none outline-none focus:ring-2 focus:ring-green-500"
+            />
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowAddNeeded(false)}
+                className="flex-1 border py-2 rounded-lg"
               >
-                <option value="">Select Category</option>
-                {SKILL_CATEGORIES.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.icon} {c.label}
-                  </option>
-                ))}
-              </select>
-
-              {/* Description Field */}
-              <textarea
-                placeholder="What specifically do you need help with? (optional)"
-                value={newNeeded.description}
-                onChange={(e) =>
-                  setNewNeeded({
-                    ...newNeeded,
-                    description: e.target.value,
-                  })
-                }
-                rows={2}
-                className="w-full border rounded-lg px-4 py-2 resize-none outline-none focus:ring-2 focus:ring-green-500"
-              />
-
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setShowAddNeeded(false)}
-                  className="flex-1 border py-2 rounded-lg"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleAddNeeded}
-                  disabled={!newNeeded.name || !newNeeded.category}
-                  className="flex-1 bg-green-600 text-white py-2 rounded-lg disabled:opacity-50"
-                >
-                  Add
-                </button>
-              </div>
+                Cancel
+              </button>
+              <button
+                onClick={handleAddNeeded}
+                disabled={!newNeeded.name || !newNeeded.category}
+                className="flex-1 bg-green-600 text-white py-2 rounded-lg disabled:opacity-50"
+              >
+                Add
+              </button>
             </div>
-          )
-         : (
+          </div>
+        ) : (
           <button
-            onClick={() => setShowAddNeeded(true)}
+            onClick={() => {
+              setShowAddNeeded(true);
+              setEditingNeeded(null);
+            }}
             className="w-full border-2 border-dashed border-gray-300 rounded-xl py-3 text-gray-600 hover:border-green-400 hover:text-green-600 transition"
           >
             + Add Skill Needed
@@ -508,7 +788,7 @@ export default function ProfileEditPage() {
           onClick={() => router.push(`/profile/${user.uid}`)}
           className="text-blue-600 font-medium hover:underline"
         >
-          👁️ View My Public Profile →
+          View My Public Profile →
         </button>
       </div>
     </div>

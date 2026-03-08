@@ -83,6 +83,40 @@ export async function removeSkillOffered(userId, skill) {
   });
 }
 
+// Update an existing offered skill
+export async function updateSkillOffered(userId, skillId, updatedData) {
+  const userDoc = await getDoc(doc(db, "users", userId));
+
+  if (!userDoc.exists()) {
+    throw new Error("User not found");
+  }
+
+  const userData = userDoc.data();
+  const currentSkills = userData.skillsOffered || [];
+
+  const updatedSkills = currentSkills.map((skill) => {
+    if (skill.id === skillId) {
+      return {
+        ...skill,
+        name: updatedData.name,
+        category: updatedData.category,
+        level: updatedData.level || "intermediate",
+        description: updatedData.description || "",
+        priceType: updatedData.priceType || "free",
+        price: updatedData.price || 0,
+        perUnit: updatedData.perUnit || "hour",
+        updatedAt: new Date().toISOString(),
+      };
+    }
+    return skill;
+  });
+
+  await updateDoc(doc(db, "users", userId), {
+    skillsOffered: updatedSkills,
+  });
+}
+
+
 // Add skill needed
 export async function addSkillNeeded(userId, skill) {
   const newSkill = {
@@ -116,6 +150,35 @@ export async function removeSkillNeeded(userId, skill) {
   const updatedSkills = currentSkills.filter((s) => s.id !== skill.id);
 
   // Write back the filtered array
+  await updateDoc(doc(db, "users", userId), {
+    skillsNeeded: updatedSkills,
+  });
+}
+
+// Update an existing needed skill
+export async function updateSkillNeeded(userId, skillId, updatedData) {
+  const userDoc = await getDoc(doc(db, "users", userId));
+
+  if (!userDoc.exists()) {
+    throw new Error("User not found");
+  }
+
+  const userData = userDoc.data();
+  const currentSkills = userData.skillsNeeded || [];
+
+  const updatedSkills = currentSkills.map((skill) => {
+    if (skill.id === skillId) {
+      return {
+        ...skill,
+        name: updatedData.name,
+        category: updatedData.category,
+        description: updatedData.description || "",
+        updatedAt: new Date().toISOString(),
+      };
+    }
+    return skill;
+  });
+
   await updateDoc(doc(db, "users", userId), {
     skillsNeeded: updatedSkills,
   });
