@@ -55,41 +55,44 @@ function MessagesContent() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-0 sm:px-6 py-0 sm:py-8">
+    <div className="max-w-6xl mx-auto px-0 sm:px-6 py-0 sm:py-6">
       <div className="bg-white rounded-none sm:rounded-2xl border-0 sm:border overflow-hidden">
-        <div className="flex h-[calc(100vh-64px)] sm:h-[600px]">
-          {/* Conversation List — hide on mobile when chat is open */}
+        <div className="flex h-[calc(100vh-64px)] sm:h-[calc(100vh-120px)] max-h-[700px]">
+
+          {/* Conversation List — Fixed header + scrollable list */}
           <div
-            className={`w-full sm:w-80 border-r shrink-0 overflow-y-auto ${
-              mobileShowChat ? "hidden sm:block" : "block"
+            className={`w-full sm:w-80 border-r flex flex-col shrink-0 ${
+              mobileShowChat ? "hidden sm:flex" : "flex"
             }`}
           >
-            <div className="p-4 border-b">
-              <h1 className="text-xl font-bold">💬 Messages</h1>
+            <div className="p-4 border-b shrink-0">
+              <h1 className="text-xl font-bold">Messages</h1>
             </div>
-            <ConversationList
-              conversations={conversations}
-              selectedId={selectedConvo?.id}
-              onSelect={handleSelectConvo}
-            />
+            <div className="flex-1 overflow-y-auto">
+              <ConversationList
+                conversations={conversations}
+                selectedId={selectedConvo?.id}
+                onSelect={handleSelectConvo}
+              />
+            </div>
           </div>
 
-          {/* Chat Window — hide on mobile when list is shown */}
+          {/* Chat Window */}
           <div
-            className={`flex-1 flex flex-col ${
-              mobileShowChat ? "block" : "hidden sm:flex"
+            className={`flex-1 flex flex-col min-w-0 ${
+              mobileShowChat ? "flex" : "hidden sm:flex"
             }`}
           >
             {/* Mobile back button */}
             {mobileShowChat && selectedConvo && (
-              <div className="sm:hidden border-b p-3 flex items-center gap-3">
+              <div className="sm:hidden border-b p-3 flex items-center gap-3 shrink-0">
                 <button
                   onClick={() => setMobileShowChat(false)}
                   className="text-blue-600 font-medium"
                 >
                   ← Back
                 </button>
-                <p className="font-semibold">
+                <p className="font-semibold truncate">
                   {selectedConvo.participantNames?.[
                     selectedConvo.participants?.find((p) => p !== user?.uid)
                   ] || "Chat"}
@@ -99,7 +102,7 @@ function MessagesContent() {
 
             {/* Desktop chat header */}
             {selectedConvo && (
-              <div className="hidden sm:flex border-b p-4 items-center gap-3">
+              <div className="hidden sm:flex border-b p-4 items-center gap-3 shrink-0">
                 <img
                   src={
                     selectedConvo.participantAvatars?.[
@@ -127,9 +130,10 @@ function MessagesContent() {
     </div>
   );
 }
+
 export default function MessagesPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading messages...</div>}>
+    <Suspense fallback={<MessagesSkeleton />}>
       <MessagesContent />
     </Suspense>
   );
