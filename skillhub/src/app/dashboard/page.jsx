@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { listenToMyBookings } from "@/lib/bookings";
 import { getSmartMatches } from "@/lib/search";
+import { DashboardSkeleton } from "@/components/Skeletons";
 
 export default function DashboardPage() {
   const { user, profile, loading } = useAuth();
@@ -37,14 +38,7 @@ export default function DashboardPage() {
   }, [user, profile]);
 
   if (loading || !profile) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-4xl mb-4 animate-pulse">🔄</div>
-          <p className="text-gray-500">Loading dashboard...</p>
-        </div>
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   const pendingBookings = bookings.filter((b) => b.status === "pending");

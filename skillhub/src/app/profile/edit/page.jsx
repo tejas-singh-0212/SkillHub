@@ -19,6 +19,7 @@ import {
 } from "@/lib/users";
 import { getCurrentLocation, toClientLocation, formatLocationDisplay } from "@/lib/location";
 import dynamic from "next/dynamic";
+import { ProfileEditSkeleton } from "@/components/Skeletons";
 
 const LocationPicker = dynamic(
   () => import("@/components/Map/LocationPicker"),
@@ -236,11 +237,7 @@ export default function ProfileEditPage() {
   };
 
   if (authLoading || !profile) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        Loading...
-      </div>
-    );
+    return <ProfileEditSkeleton />;
   }
 
   return (

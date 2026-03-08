@@ -11,6 +11,7 @@ import {
 import { hasReviewedBooking } from "@/lib/reviews";
 import { createConversation } from "@/lib/messages";
 import ReviewForm from "@/components/ReviewForm";
+import { BookingsSkeleton } from "@/components/Skeletons";
 
 export default function BookingsPage() {
   const { user, profile, loading: authLoading } = useAuth();
@@ -138,11 +139,7 @@ export default function BookingsPage() {
   };
 
   if (authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        Loading...
-      </div>
-    );
+    return <BookingsSkeleton />;
   }
 
   const currentBookings =

@@ -7,6 +7,7 @@ import { listenToConversations, markAsRead } from "@/lib/messages";
 import ConversationList from "@/components/ConversationList";
 import ChatWindow from "@/components/ChatWindow";
 import { Suspense } from "react";
+import { MessagesSkeleton } from "@/components/Skeletons";
 
 function MessagesContent() {
   const { user, loading: authLoading } = useAuth();
@@ -50,11 +51,7 @@ function MessagesContent() {
   };
 
   if (authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        Loading...
-      </div>
-    );
+    return <MessagesSkeleton />;
   }
 
   return (

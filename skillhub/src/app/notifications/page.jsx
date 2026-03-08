@@ -9,6 +9,7 @@ import {
   markAllNotificationsRead,
 } from "@/lib/notifications";
 import { listenToTotalUnreadMessages } from "@/lib/messages";
+import { NotificationsSkeleton } from "@/components/Skeletons";
 
 export default function NotificationsPage() {
   const { user, loading: authLoading } = useAuth();
@@ -94,11 +95,7 @@ export default function NotificationsPage() {
   };
 
   if (authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        Loading...
-      </div>
-    );
+    return <NotificationsSkeleton />;
   }
 
   const unreadCount = notifications.filter((n) => !n.isRead).length;

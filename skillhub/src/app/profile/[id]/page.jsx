@@ -11,6 +11,7 @@ import BookingModal from "@/components/BookingModal";
 import ReviewList from "@/components/ReviewList";
 import { SKILL_CATEGORIES } from "@/lib/users";
 import { formatLocationDisplay } from "@/lib/location";
+import { ProfileSkeleton } from "@/components/Skeletons";
 
 export default function ProfilePage() {
   const params = useParams();
@@ -60,14 +61,7 @@ export default function ProfilePage() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-4xl mb-4 animate-pulse">👤</div>
-          <p className="text-gray-500">Loading profile...</p>
-        </div>
-      </div>
-    );
+    return <ProfileSkeleton />;
   }
 
   if (!profileData) {

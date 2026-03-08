@@ -16,6 +16,7 @@ import {
 } from "@/lib/users";
 import { getCurrentLocation, toClientLocation, formatLocationDisplay } from "@/lib/location";
 import dynamic from "next/dynamic";
+import { OnboardingSkeleton } from "@/components/Skeletons";
 
 const LocationPicker = dynamic(
   () => import("@/components/Map/LocationPicker"),
@@ -83,11 +84,7 @@ export default function OnboardingPage() {
   }, [authLoading, user, router]);
 
   if (authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">Loading...</div>
-      </div>
-    );
+    return <OnboardingSkeleton />;
   }
 
   const handleAutoDetectLocation = async () => {
