@@ -701,7 +701,7 @@ export default function ProfileEditPage() {
                       onClick={() => handleStartEditNeeded(skill)}
                       className="text-green-500 hover:text-green-700 text-sm font-medium px-2 py-1 rounded-lg hover:bg-green-100 transition"
                     >
-                      ✏️ Edit
+                      Edit
                     </button>
                     <button
                       onClick={() => handleRemoveNeeded(skill)}
