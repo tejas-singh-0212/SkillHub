@@ -8,15 +8,16 @@ import {
   onSnapshot,
   serverTimestamp,
   getDoc,
-  orderBy,    
-  limit,      
-  startAfter, 
-  getDocs,    
+  orderBy,
+  limit,
+  startAfter,
+  getDocs,
+  increment,  
 } from "firebase/firestore";
 import { db } from "./firebase";
 import { createNotification } from "./notifications";
 
-// Create a new booking + notify provider
+// Create a new booking + NOTIFY provider
 export async function createBooking(bookingData) {
   const booking = await addDoc(collection(db, "bookings"), {
     requesterId: bookingData.requesterId,
@@ -37,7 +38,6 @@ export async function createBooking(bookingData) {
     createdAt: serverTimestamp(),
   });
 
-  // notify: Provider about new booking
   await createNotification(bookingData.providerId, {
     type: "new_booking",
     title: "New Booking Request 📅",
@@ -49,9 +49,9 @@ export async function createBooking(bookingData) {
   return booking.id;
 }
 
-// Update booking status + NOTIFY relevant party
+// Update booking status + NOTIFY + UPDATE COUNTS
 export async function updateBookingStatus(bookingId, status) {
-  // Get booking details for notification
+  // Get booking details
   const bookingDoc = await getDoc(doc(db, "bookings", bookingId));
   const bookingData = bookingDoc.data();
 
@@ -61,7 +61,6 @@ export async function updateBookingStatus(bookingId, status) {
     updatedAt: serverTimestamp(),
   });
 
-  // Send notifications based on status change
   if (bookingData) {
     switch (status) {
       case "accepted":
@@ -85,7 +84,15 @@ export async function updateBookingStatus(bookingId, status) {
         break;
 
       case "completed":
-        // Notify BOTH parties
+        // increment totalBookings for BOTH users
+        await updateDoc(doc(db, "users", bookingData.providerId), {
+          totalBookings: increment(1),
+        });
+        await updateDoc(doc(db, "users", bookingData.requesterId), {
+          totalBookings: increment(1),
+        });
+
+        // Notify both parties
         await createNotification(bookingData.requesterId, {
           type: "booking_completed",
           title: "Session Completed! ⭐",
@@ -170,7 +177,7 @@ export function listenToMyBookings(userId, callback) {
   };
 }
 
-// Paginated bookings (for large lists)
+// Paginated bookings
 export async function getReceivedBookingsPaginated(
   userId,
   lastDoc = null,
