@@ -277,17 +277,16 @@ export default function ProfileEditPage() {
             </div>
           ))}
         </div>
-
         {showAddOffered ? (
           <div className="border-2 border-blue-200 rounded-xl p-4 space-y-3">
             <input
               type="text"
-              placeholder="Skill name"
+              placeholder="Skill name (e.g., Guitar Lessons)"
               value={newOffered.name}
               onChange={(e) =>
                 setNewOffered({ ...newOffered, name: e.target.value })
               }
-              className="w-full border rounded-lg px-4 py-2 outline-none"
+              className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
             />
             <select
               value={newOffered.category}
@@ -316,6 +315,21 @@ export default function ProfileEditPage() {
                 </option>
               ))}
             </select>
+
+            {/*Description Field */}
+            <textarea
+              placeholder="Brief description — what exactly do you offer? (optional)"
+              value={newOffered.description}
+              onChange={(e) =>
+                setNewOffered({
+                  ...newOffered,
+                  description: e.target.value,
+                })
+              }
+              rows={2}
+              className="w-full border rounded-lg px-4 py-2 resize-none outline-none focus:ring-2 focus:ring-blue-500"
+            />
+
             <div className="grid grid-cols-3 gap-2">
               {PRICE_TYPES.map((pt) => (
                 <button
@@ -421,49 +435,64 @@ export default function ProfileEditPage() {
             </div>
           ))}
         </div>
+          {showAddNeeded ? (
+            <div className="border-2 border-green-200 rounded-xl p-4 space-y-3">
+              <input
+                type="text"
+                placeholder="Skill you need (e.g., Web Development)"
+                value={newNeeded.name}
+                onChange={(e) =>
+                  setNewNeeded({ ...newNeeded, name: e.target.value })
+                }
+                className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-green-500"
+              />
+              <select
+                value={newNeeded.category}
+                onChange={(e) =>
+                  setNewNeeded({ ...newNeeded, category: e.target.value })
+                }
+                className="w-full border rounded-lg px-4 py-2"
+              >
+                <option value="">Select Category</option>
+                {SKILL_CATEGORIES.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.icon} {c.label}
+                  </option>
+                ))}
+              </select>
 
-        {showAddNeeded ? (
-          <div className="border-2 border-green-200 rounded-xl p-4 space-y-3">
-            <input
-              type="text"
-              placeholder="Skill you need"
-              value={newNeeded.name}
-              onChange={(e) =>
-                setNewNeeded({ ...newNeeded, name: e.target.value })
-              }
-              className="w-full border rounded-lg px-4 py-2 outline-none"
-            />
-            <select
-              value={newNeeded.category}
-              onChange={(e) =>
-                setNewNeeded({ ...newNeeded, category: e.target.value })
-              }
-              className="w-full border rounded-lg px-4 py-2"
-            >
-              <option value="">Select Category</option>
-              {SKILL_CATEGORIES.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.icon} {c.label}
-                </option>
-              ))}
-            </select>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowAddNeeded(false)}
-                className="flex-1 border py-2 rounded-lg"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleAddNeeded}
-                disabled={!newNeeded.name || !newNeeded.category}
-                className="flex-1 bg-green-600 text-white py-2 rounded-lg disabled:opacity-50"
-              >
-                Add
-              </button>
+              {/* Description Field */}
+              <textarea
+                placeholder="What specifically do you need help with? (optional)"
+                value={newNeeded.description}
+                onChange={(e) =>
+                  setNewNeeded({
+                    ...newNeeded,
+                    description: e.target.value,
+                  })
+                }
+                rows={2}
+                className="w-full border rounded-lg px-4 py-2 resize-none outline-none focus:ring-2 focus:ring-green-500"
+              />
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowAddNeeded(false)}
+                  className="flex-1 border py-2 rounded-lg"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleAddNeeded}
+                  disabled={!newNeeded.name || !newNeeded.category}
+                  className="flex-1 bg-green-600 text-white py-2 rounded-lg disabled:opacity-50"
+                >
+                  Add
+                </button>
+              </div>
             </div>
-          </div>
-        ) : (
+          )
+         : (
           <button
             onClick={() => setShowAddNeeded(true)}
             className="w-full border-2 border-dashed border-gray-300 rounded-xl py-3 text-gray-600 hover:border-green-400 hover:text-green-600 transition"
