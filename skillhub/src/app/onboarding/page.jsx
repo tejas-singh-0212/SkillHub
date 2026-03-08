@@ -12,6 +12,7 @@ import {
   SKILL_CATEGORIES,
   PROFICIENCY_LEVELS,
   PRICE_TYPES,
+  PER_UNIT_OPTIONS,
 } from "@/lib/users";
 import { getCurrentLocation, toClientLocation, formatLocationDisplay } from "@/lib/location";
 import dynamic from "next/dynamic";
@@ -320,16 +321,14 @@ export default function OnboardingPage() {
                   <div>
                     <p className="font-semibold">{skill.name}</p>
                     <p className="text-sm text-gray-600">
-                      {SKILL_CATEGORIES.find((c) => c.id === skill.category)
-                        ?.icon}{" "}
-                      {SKILL_CATEGORIES.find((c) => c.id === skill.category)
-                        ?.label}{" "}
+                      {SKILL_CATEGORIES.find((c) => c.id === skill.category)?.icon}{" "}
+                      {SKILL_CATEGORIES.find((c) => c.id === skill.category)?.label}{" "}
                       • {skill.level} •{" "}
                       {skill.priceType === "free"
                         ? "Free"
                         : skill.priceType === "barter"
                         ? "Barter"
-                        : `₹${skill.price}/${skill.perUnit}`}
+                        : `₹${skill.price} ${PER_UNIT_OPTIONS.find((o) => o.id === skill.perUnit)?.label || skill.perUnit}`}
                     </p>
                   </div>
                   <button
@@ -423,32 +422,44 @@ export default function OnboardingPage() {
 
                   {newOffered.priceType === "paid" && (
                     <div className="flex gap-3">
-                      <input
-                        type="number"
-                        placeholder="Price (₹)"
-                        value={newOffered.price || ""}
-                        onChange={(e) =>
-                          setNewOffered({
-                            ...newOffered,
-                            price: parseInt(e.target.value) || 0,
-                          })
-                        }
-                        className="flex-1 border rounded-lg px-4 py-2"
-                      />
-                      <select
-                        value={newOffered.perUnit}
-                        onChange={(e) =>
-                          setNewOffered({
-                            ...newOffered,
-                            perUnit: e.target.value,
-                          })
-                        }
-                        className="border rounded-lg px-4 py-2"
-                      >
-                        <option value="hour">per hour</option>
-                        <option value="session">per session</option>
-                        <option value="project">per project</option>
-                      </select>
+                      <div className="flex-1">
+                        <label className="block text-xs text-gray-500 mb-1">
+                          Price (₹)
+                        </label>
+                        <input
+                          type="number"
+                          placeholder="e.g., 500"
+                          value={newOffered.price || ""}
+                          onChange={(e) =>
+                            setNewOffered({
+                              ...newOffered,
+                              price: parseInt(e.target.value) || 0,
+                            })
+                          }
+                          className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-gray-500 mb-1">
+                          Billing
+                        </label>
+                        <select
+                          value={newOffered.perUnit}
+                          onChange={(e) =>
+                            setNewOffered({
+                              ...newOffered,
+                              perUnit: e.target.value,
+                            })
+                          }
+                          className="border rounded-lg px-4 py-2 h-[42px]"
+                        >
+                          {PER_UNIT_OPTIONS.map((opt) => (
+                            <option key={opt.id} value={opt.id}>
+                              {opt.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
                     </div>
                   )}
 

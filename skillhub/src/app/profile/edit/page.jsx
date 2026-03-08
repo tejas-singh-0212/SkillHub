@@ -13,6 +13,7 @@ import {
   SKILL_CATEGORIES,
   PROFICIENCY_LEVELS,
   PRICE_TYPES,
+  PER_UNIT_OPTIONS,
 } from "@/lib/users";
 import { getCurrentLocation, toClientLocation, formatLocationDisplay } from "@/lib/location";
 import dynamic from "next/dynamic";
@@ -259,7 +260,7 @@ export default function ProfileEditPage() {
                     ? "Free"
                     : skill.priceType === "barter"
                     ? "Barter"
-                    : `₹${skill.price}/${skill.perUnit}`}
+                    : `₹${skill.price} ${PER_UNIT_OPTIONS.find((o) => o.id === skill.perUnit)?.label || skill.perUnit}`}
                 </p>
               </div>
               <button
@@ -329,18 +330,38 @@ export default function ProfileEditPage() {
               ))}
             </div>
             {newOffered.priceType === "paid" && (
-              <input
-                type="number"
-                placeholder="Price (₹)"
-                value={newOffered.price || ""}
-                onChange={(e) =>
-                  setNewOffered({
-                    ...newOffered,
-                    price: parseInt(e.target.value) || 0,
-                  })
-                }
-                className="w-full border rounded-lg px-4 py-2"
-              />
+              <div className="flex gap-3">
+                <div className="flex-1">
+                  <input
+                    type="number"
+                    placeholder="Price (₹)"
+                    value={newOffered.price || ""}
+                    onChange={(e) =>
+                      setNewOffered({
+                        ...newOffered,
+                        price: parseInt(e.target.value) || 0,
+                      })
+                    }
+                    className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <select
+                  value={newOffered.perUnit}
+                  onChange={(e) =>
+                    setNewOffered({
+                      ...newOffered,
+                      perUnit: e.target.value,
+                    })
+                  }
+                  className="border rounded-lg px-4 py-2"
+                >
+                  {PER_UNIT_OPTIONS.map((opt) => (
+                    <option key={opt.id} value={opt.id}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
             )}
             <div className="flex gap-3">
               <button

@@ -159,3 +159,9 @@ export const PRICE_TYPES = [
     description: "Exchange for another skill",
   },
 ];
+
+export const PER_UNIT_OPTIONS = [
+  { id: "hour", label: "per hour", shortLabel: "/hr" },
+  { id: "session", label: "per session", shortLabel: "/session" },
+  { id: "day", label: "per day", shortLabel: "/day" },
+];

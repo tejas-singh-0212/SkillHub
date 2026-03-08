@@ -235,13 +235,13 @@ export default function BookingsPage() {
                         ⏱️ {booking.duration} min
                       </span>
                     </div>
-                    <p className="text-sm mt-1">
-                      {booking.paymentType === "free"
-                        ? "🆓 Free"
-                        : booking.paymentType === "barter"
-                        ? `🔄 Barter: ${booking.barterExchange}`
-                        : `💰 ₹${booking.amount}`}
-                    </p>
+                      <p className="text-sm mt-1">
+                        {booking.paymentType === "free"
+                          ? "🆓 Free"
+                          : booking.paymentType === "barter"
+                          ? `🔄 Barter: ${booking.barterExchange}`
+                          : `💰 ₹${booking.amount} (${booking.duration} min session)`}
+                      </p>
                     {booking.message && (
                       <p className="text-sm text-gray-500 mt-1 italic">
                         &quot;{booking.message}&quot;

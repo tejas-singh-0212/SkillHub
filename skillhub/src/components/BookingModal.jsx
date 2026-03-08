@@ -76,6 +76,17 @@ export default function BookingModal({ skill, provider, onClose }) {
         <div className="bg-blue-50 rounded-lg p-3 mb-4">
           <p className="font-medium">{skill.name}</p>
           <p className="text-sm text-gray-600">with {provider.name}</p>
+          {skill.priceType === "paid" && (
+            <p className="text-sm font-semibold text-orange-600 mt-1">
+              💰 ₹{skill.price} {skill.perUnit === "hour" ? "per hour" : skill.perUnit === "session" ? "per session" : skill.perUnit === "day" ? "per day" : skill.perUnit}
+            </p>
+          )}
+          {skill.priceType === "free" && (
+            <p className="text-sm font-semibold text-green-600 mt-1">🆓 Free</p>
+          )}
+          {skill.priceType === "barter" && (
+            <p className="text-sm font-semibold text-blue-600 mt-1">🔄 Barter Exchange</p>
+          )}
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -137,7 +148,7 @@ export default function BookingModal({ skill, provider, onClose }) {
                   {type === "free"
                     ? "🆓 Free"
                     : type === "paid"
-                    ? `💰 ₹${skill.price}`
+                    ? `💰 ₹${skill.price}/${skill.perUnit === "hour" ? "hr" : skill.perUnit === "session" ? "sess" : skill.perUnit === "day" ? "day" : skill.perUnit}`
                     : "🔄 Barter"}
                 </button>
               ))}

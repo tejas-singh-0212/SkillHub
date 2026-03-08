@@ -237,7 +237,7 @@ export default function DashboardPage() {
                 ? "🆓 Free"
                 : skill.priceType === "barter"
                 ? "🔄 Barter"
-                : `💰 ₹${skill.price}/${skill.perUnit}`}
+                : `💰 ₹${skill.price} ${skill.perUnit === "hour" ? "per hour" : skill.perUnit === "session" ? "per session" : skill.perUnit === "day" ? "per day" : skill.perUnit}`}
             </p>
           </div>
         ))}

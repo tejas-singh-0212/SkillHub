@@ -1,9 +1,10 @@
 "use client";
 
-import { SKILL_CATEGORIES } from "@/lib/users";
+import { SKILL_CATEGORIES, PER_UNIT_OPTIONS } from "@/lib/users";
 
 export default function SkillCard({ skill, onBook, onRemove, showActions = false }) {
   const category = SKILL_CATEGORIES.find((c) => c.id === skill.category);
+  const perUnit = PER_UNIT_OPTIONS.find((o) => o.id === skill.perUnit);
 
   return (
     <div className="bg-white border rounded-xl p-4 hover:shadow-md transition">
@@ -30,12 +31,20 @@ export default function SkillCard({ skill, onBook, onRemove, showActions = false
       )}
 
       <div className="flex justify-between items-center mt-3">
+        {/* updated: Better price display */}
         <span className="text-sm font-medium">
-          {skill.priceType === "free"
-            ? "🆓 Free"
-            : skill.priceType === "barter"
-            ? "🔄 Barter"
-            : `💰 ₹${skill.price}/${skill.perUnit}`}
+          {skill.priceType === "free" ? (
+            <span className="text-green-600">🆓 Free</span>
+          ) : skill.priceType === "barter" ? (
+            <span className="text-blue-600">🔄 Barter</span>
+          ) : (
+            <span className="text-orange-600">
+              💰 ₹{skill.price}{" "}
+              <span className="text-gray-500 font-normal">
+                {perUnit?.label || skill.perUnit}
+              </span>
+            </span>
+          )}
         </span>
 
         {onBook && (
