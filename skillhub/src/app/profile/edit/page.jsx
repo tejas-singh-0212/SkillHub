@@ -12,6 +12,7 @@ import {
   removeSkillNeeded,
   updateSkillOffered,
   updateSkillNeeded,
+  uploadProfilePicture,
   SKILL_CATEGORIES,
   PROFICIENCY_LEVELS,
   PRICE_TYPES,
@@ -38,6 +39,8 @@ export default function ProfileEditPage() {
   const router = useRouter();
 
   const [saving, setSaving] = useState(false);
+const [uploadingImage, setUploadingImage] = useState(false);
+
   
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
@@ -247,10 +250,54 @@ export default function ProfileEditPage() {
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8">
       <h1 className="text-3xl font-bold mb-8">⚙️ Edit Profile</h1>
+      
 
       {/* Basic Info */}
       <div className="bg-white rounded-2xl border p-6 mb-6">
         <h2 className="text-lg font-bold mb-4">👤 Basic Information</h2>
+                {/* profile picture upload */}
+        <div className="flex flex-col sm:flex-row items-center gap-4 mb-6 pb-6 border-b">
+          <img
+            src={
+              profile.avatar ||
+              `https://ui-avatars.com/api/?name=${encodeURIComponent(name || "U")}&background=random`
+            }
+            alt="Profile"
+            className="w-24 h-24 rounded-full object-cover border-4 border-gray-100"
+          />
+          <div>
+            <p className="font-medium mb-1">Profile Picture</p>
+            <label className={`cursor-pointer bg-blue-50 text-blue-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-100 transition inline-block ${uploadingImage ? 'opacity-50 pointer-events-none' : ''}`}>
+              {uploadingImage ? "Uploading..." : "📷 Change Photo"}
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  
+                  if (file.size > 5 * 1024 * 1024) {
+                    toast.error("Image must be smaller than 5MB");
+                    return;
+                  }
+
+                  setUploadingImage(true);
+                  try {
+                    await uploadProfilePicture(user.uid, file);
+                    await refreshProfile();
+                    toast.success("Profile picture updated!");
+                  } catch (err) {
+                    toast.error("Failed to upload picture");
+                  } finally {
+                    setUploadingImage(false);
+                  }
+                }}
+              />
+            </label>
+            <p className="text-xs text-gray-500 mt-2">JPG, PNG or GIF (Max 5MB)</p>
+          </div>
+        </div>
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium mb-1">Full Name</label>

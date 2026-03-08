@@ -228,3 +228,35 @@ export const PER_UNIT_OPTIONS = [
   { id: "session", label: "per session", shortLabel: "/session" },
   { id: "day", label: "per day", shortLabel: "/day" },
 ];
+
+// Upload Profile Picture (Via ImgBB)
+export async function uploadProfilePicture(userId, file) {
+  if (!file) throw new Error("No file provided");
+
+  // 1. Prepare the image for upload
+  const formData = new FormData();
+  formData.append("image", file);
+
+  // 2. Send to ImgBB (REPLACE WITH YOUR ACTUAL API KEY)
+  const IMGBB_API_KEY = "YOUR_IMGBB_API_KEY"; 
+  const res = await fetch(`https://api.imgbb.com/1/upload?key=${e59b6356d01270363bcd870970b98719}`, {
+    method: "POST",
+    body: formData,
+  });
+
+  const data = await res.json();
+
+  if (!data.success) {
+    throw new Error("Failed to upload image");
+  }
+
+  // 3. Get the URL they give us back
+  const imageUrl = data.data.url;
+
+  // 4. Update the user's Firestore profile with the new avatar URL
+  await updateDoc(doc(db, "users", userId), {
+    avatar: imageUrl,
+  });
+
+  return imageUrl;
+}
