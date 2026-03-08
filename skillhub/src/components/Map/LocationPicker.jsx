@@ -259,7 +259,7 @@ export default function LocationPicker({ onLocationSelect, initialLocation }) {
 
       {/* Helper Text */}
       <p className="text-sm text-gray-500 mb-2">
-        👆 Search above or click anywhere on the map to set your location
+        Search above or click anywhere on the map to set your location
       </p>
 
       {/* map — z-index set to 1, pointer events enabled */}

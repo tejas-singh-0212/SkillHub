@@ -186,7 +186,7 @@ export default function ProfilePage() {
       <div className="mb-6">
         <h2 className="text-xl font-bold mb-4">🔍 Skills Needed</h2>
         {profileData.skillsNeeded?.length > 0 ? (
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-3">
             {profileData.skillsNeeded.map((skill, i) => {
               const cat = SKILL_CATEGORIES.find(
                 (c) => c.id === skill.category
@@ -194,14 +194,14 @@ export default function ProfilePage() {
               return (
                 <div
                   key={i}
-                  className="bg-green-50 border border-green-200 rounded-lg px-4 py-2"
+                  className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 w-full sm:w-auto"
                 >
                   <span className="font-medium">
                     {cat?.icon} {skill.name}
                   </span>
                   {skill.description && (
-                    <p className="text-xs text-gray-600 mt-1">
-                      {skill.description}
+                    <p className="text-sm text-gray-600 mt-1 italic">
+                      "{skill.description}"
                     </p>
                   )}
                 </div>

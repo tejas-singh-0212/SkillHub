@@ -316,9 +316,9 @@ export default function OnboardingPage() {
               {offeredSkills.map((skill, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between bg-blue-50 rounded-xl p-4"
+                  className="flex items-start justify-between bg-blue-50 rounded-xl p-4"
                 >
-                  <div>
+                  <div className="flex-1 min-w-0 mr-3">
                     <p className="font-semibold">{skill.name}</p>
                     <p className="text-sm text-gray-600">
                       {SKILL_CATEGORIES.find((c) => c.id === skill.category)?.icon}{" "}
@@ -330,14 +330,17 @@ export default function OnboardingPage() {
                         ? "Barter"
                         : `₹${skill.price} ${PER_UNIT_OPTIONS.find((o) => o.id === skill.perUnit)?.label || skill.perUnit}`}
                     </p>
+                    {skill.description && (
+                      <p className="text-sm text-gray-500 mt-1 italic">
+                        "{skill.description}"
+                      </p>
+                    )}
                   </div>
                   <button
                     onClick={() =>
-                      setOfferedSkills(
-                        offeredSkills.filter((_, i) => i !== index)
-                      )
+                      setOfferedSkills(offeredSkills.filter((_, i) => i !== index))
                     }
-                    className="text-red-500 hover:text-red-700 text-xl"
+                    className="text-red-500 hover:text-red-700 text-xl shrink-0"
                   >
                     ✕
                   </button>
@@ -516,24 +519,25 @@ export default function OnboardingPage() {
               {neededSkills.map((skill, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between bg-green-50 rounded-xl p-4"
+                  className="flex items-start justify-between bg-green-50 rounded-xl p-4"
                 >
-                  <div>
+                  <div className="flex-1 min-w-0 mr-3">
                     <p className="font-semibold">{skill.name}</p>
                     <p className="text-sm text-gray-600">
-                      {SKILL_CATEGORIES.find((c) => c.id === skill.category)
-                        ?.icon}{" "}
-                      {SKILL_CATEGORIES.find((c) => c.id === skill.category)
-                        ?.label}
+                      {SKILL_CATEGORIES.find((c) => c.id === skill.category)?.icon}{" "}
+                      {SKILL_CATEGORIES.find((c) => c.id === skill.category)?.label}
                     </p>
+                    {skill.description && (
+                      <p className="text-sm text-gray-500 mt-1 italic">
+                        "{skill.description}"
+                      </p>
+                    )}
                   </div>
                   <button
                     onClick={() =>
-                      setNeededSkills(
-                        neededSkills.filter((_, i) => i !== index)
-                      )
+                      setNeededSkills(neededSkills.filter((_, i) => i !== index))
                     }
-                    className="text-red-500 hover:text-red-700 text-xl"
+                    className="text-red-500 hover:text-red-700 text-xl shrink-0"
                   >
                     ✕
                   </button>

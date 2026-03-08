@@ -232,6 +232,11 @@ export default function DashboardPage() {
             <p className="text-sm text-gray-600 mt-1">
               {skill.category} • {skill.level}
             </p>
+            {skill.description && (
+              <p className="text-sm text-gray-500 mt-2 italic line-clamp-2">
+                "{skill.description}"
+              </p>
+            )}
             <p className="text-sm mt-2">
               {skill.priceType === "free"
                 ? "🆓 Free"

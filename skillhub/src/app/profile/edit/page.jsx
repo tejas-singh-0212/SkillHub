@@ -250,9 +250,9 @@ export default function ProfileEditPage() {
           {profile.skillsOffered?.map((skill, i) => (
             <div
               key={i}
-              className="flex items-center justify-between bg-blue-50 rounded-xl p-4"
+              className="flex items-start justify-between bg-blue-50 rounded-xl p-4"
             >
-              <div>
+              <div className="flex-1 min-w-0 mr-3">
                 <p className="font-semibold">{skill.name}</p>
                 <p className="text-sm text-gray-600">
                   {skill.category} • {skill.level} •{" "}
@@ -262,10 +262,15 @@ export default function ProfileEditPage() {
                     ? "Barter"
                     : `₹${skill.price} ${PER_UNIT_OPTIONS.find((o) => o.id === skill.perUnit)?.label || skill.perUnit}`}
                 </p>
+                {skill.description && (
+                  <p className="text-sm text-gray-500 mt-1 italic">
+                    "{skill.description}"
+                  </p>
+                )}
               </div>
               <button
                 onClick={() => handleRemoveOffered(skill)}
-                className="text-red-500 hover:text-red-700 text-lg"
+                className="text-red-500 hover:text-red-700 text-lg shrink-0"
               >
                 ✕
               </button>
@@ -396,15 +401,20 @@ export default function ProfileEditPage() {
           {profile.skillsNeeded?.map((skill, i) => (
             <div
               key={i}
-              className="flex items-center justify-between bg-green-50 rounded-xl p-4"
+              className="flex items-start justify-between bg-green-50 rounded-xl p-4"
             >
-              <div>
+              <div className="flex-1 min-w-0 mr-3">
                 <p className="font-semibold">{skill.name}</p>
                 <p className="text-sm text-gray-600">{skill.category}</p>
+                {skill.description && (
+                  <p className="text-sm text-gray-500 mt-1 italic">
+                    "{skill.description}"
+                  </p>
+                )}
               </div>
               <button
                 onClick={() => handleRemoveNeeded(skill)}
-                className="text-red-500 hover:text-red-700 text-lg"
+                className="text-red-500 hover:text-red-700 text-lg shrink-0"
               >
                 ✕
               </button>
