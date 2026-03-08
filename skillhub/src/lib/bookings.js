@@ -13,6 +13,7 @@ import {
   startAfter,
   getDocs,
   increment,  
+  // ✅ ADD THIS IMPORT
 } from "firebase/firestore";
 import { db } from "./firebase";
 import { createNotification } from "./notifications";
@@ -47,6 +48,20 @@ export async function createBooking(bookingData) {
   });
 
   return booking.id;
+}
+
+// Check for Booking Conflicts
+export async function checkBookingConflict(providerId, date, time) {
+  const q = query(
+    collection(db, "bookings"),
+    where("providerId", "==", providerId),
+    where("scheduledDate", "==", date),
+    where("scheduledTime", "==", time),
+    where("status", "in", ["pending", "accepted"])
+  );
+  
+  const snap = await getDocs(q);
+  return !snap.empty; // Returns true if a conflict exists
 }
 
 // Update booking status + NOTIFY + UPDATE COUNTS

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { createBooking } from "@/lib/bookings";
+import { createBooking, checkBookingConflict  } from "@/lib/bookings";
 import { useAuth } from "./AuthProvider";
 import toast from "react-hot-toast"; 
 
@@ -17,38 +17,48 @@ export default function BookingModal({ skill, provider, onClose }) {
   const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!date || !time) return;
+  e.preventDefault();
+  if (!date || !time) return;
 
-    setLoading(true);
-    try {
-      await createBooking({
-        requesterId: user.uid,
-        requesterName: profile?.name || "",
-        requesterAvatar: profile?.avatar || "",
-        providerId: provider.id,
-        providerName: provider.name,
-        providerAvatar: provider.avatar || "",
-        skillName: skill.name,
-        date,
-        time,
-        duration,
-        paymentType,
-        amount: paymentType === "paid" ? skill.price : 0,
-        barterExchange: barterOffer,
-        message,
-      });
-      
-      setSuccess(true);
-      toast.success("Booking request sent! 📨");
-      
-      setTimeout(() => onClose(), 2000);
-    } catch (err) {
-      toast.error("Error creating booking: " + err.message);
-    } finally {
+  setLoading(true);
+  try {
+    // 1. Check for conflicts first
+    const hasConflict = await checkBookingConflict(provider.id, date, time);
+    
+    if (hasConflict) {
+      toast.error("This time slot is already booked or pending. Please choose another time.");
       setLoading(false);
+      return; // Stop the execution here!
     }
-  };
+
+    // 2. If no conflict, create the booking
+    await createBooking({
+      requesterId: user.uid,
+      requesterName: profile?.name || "",
+      requesterAvatar: profile?.avatar || "",
+      providerId: provider.id,
+      providerName: provider.name,
+      providerAvatar: provider.avatar || "",
+      skillName: skill.name,
+      date,
+      time,
+      duration,
+      paymentType,
+      amount: paymentType === "paid" ? skill.price : 0,
+      barterExchange: barterOffer,
+      message,
+    });
+    
+    setSuccess(true);
+    toast.success("Booking request sent! 📨"); 
+    
+    setTimeout(() => onClose(), 2000);
+  } catch (err) {
+    toast.error("Error creating booking: " + err.message); 
+  } finally {
+    setLoading(false);
+  }
+};
 
   if (success) {
     return (
