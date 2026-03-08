@@ -239,7 +239,7 @@ export async function uploadProfilePicture(userId, file) {
 
   // 2. Send to ImgBB (REPLACE WITH YOUR ACTUAL API KEY)
   const IMGBB_API_KEY = "YOUR_IMGBB_API_KEY"; 
-  const res = await fetch(`https://api.imgbb.com/1/upload?key=${e59b6356d01270363bcd870970b98719}`, {
+  const res = await fetch(`https://api.imgbb.com/1/upload?key=${"e59b6356d01270363bcd870970b98719"}`, {
     method: "POST",
     body: formData,
   });
