@@ -20,7 +20,7 @@ export default function HomePage() {
             </h1>
             <p className="text-xl md:text-2xl text-blue-100 mb-8 leading-relaxed">
               Offer your talents. Learn something new. Barter, pay, or share for
-              free, all within your local neighborhood.
+              free, all within your local neighbourhood.
             </p>
             <div className="flex flex-wrap gap-4">
               {!loading && !user ? (
