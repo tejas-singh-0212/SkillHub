@@ -13,7 +13,6 @@ import {
   startAfter,
   getDocs,
   increment,  
-  // ✅ ADD THIS IMPORT
 } from "firebase/firestore";
 import { db } from "./firebase";
 import { createNotification } from "./notifications";

@@ -35,7 +35,7 @@ export default function HomePage() {
                     href="/search"
                     className="bg-white/10 backdrop-blur text-white px-8 py-4 rounded-xl text-lg font-medium hover:bg-white/20 transition border border-white/30"
                   >
-                    🔍 Explore Skills
+                    Explore Skills
                   </Link>
                 </>
               ) : !loading && user ? (

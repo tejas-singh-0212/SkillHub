@@ -518,7 +518,7 @@ const [uploadingImage, setUploadingImage] = useState(false);
                       onClick={() => handleStartEditOffered(skill)}
                       className="text-blue-500 hover:text-blue-700 text-sm font-medium px-2 py-1 rounded-lg hover:bg-blue-100 transition"
                     >
-                      ✏️ Edit
+                      Edit
                     </button>
                     <button
                       onClick={() => handleRemoveOffered(skill)}
@@ -743,7 +743,7 @@ const [uploadingImage, setUploadingImage] = useState(false);
                       onClick={() => handleStartEditNeeded(skill)}
                       className="text-green-500 hover:text-green-700 text-sm font-medium px-2 py-1 rounded-lg hover:bg-green-100 transition"
                     >
-                      ✏️ Edit
+                      Edit
                     </button>
                     <button
                       onClick={() => handleRemoveNeeded(skill)}
