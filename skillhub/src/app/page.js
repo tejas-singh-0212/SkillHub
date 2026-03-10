@@ -29,7 +29,7 @@ export default function HomePage() {
                     href="/register"
                     className="bg-yellow-400 text-gray-900 px-8 py-4 rounded-xl text-lg font-bold hover:bg-yellow-300 transition shadow-lg"
                   >
-                    Get Started — It&apos;s Free
+                    Get Started for Free
                   </Link>
                   <Link
                     href="/search"
