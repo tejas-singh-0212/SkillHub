@@ -23,6 +23,18 @@ Built with 💙 by **Team Bit Benders**.
 
 ---
 
+## Performance Snapshot
+
+We evaluated SkillHub using Google PageSpeed Insights.
+
+- **Desktop:** 100 Performance, 100 Accessibility, 100 Best Practices, 100 SEO
+- **Mobile:** Strong accessibility, best practices, and SEO, with performance optimization planned for future iterations
+
+| Desktop | Mobile |
+|--------|--------|
+| ![Desktop PageSpeed](./public/readme/desktop-pagespeed.png) | ![Mobile PageSpeed](./public/readme/mobile-pagespeed.png) |
+
+
 ## Core Features
 
 *   **Geospatial Skill Discovery:** Find skilled individuals near you using our interactive map powered by Leaflet, OpenStreetMap, and Geohashing.
