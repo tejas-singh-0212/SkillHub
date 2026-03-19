@@ -11,30 +11,30 @@ Built with 💙 by **Team Bit Benders**.
 
 ---
 
-## 📑 Table of Contents
-1. [✨ Core Features](#-core-features)
-2. [🛠️ Tech Stack](#️-tech-stack)
-3. [🧠 Architecture & Engineering](#-architecture--engineering)
-4. [🔒 Security & Database Rules](#-security--database-rules)
-5. [🚀 Getting Started](#-getting-started)
-6. [📂 Project Structure](#-project-structure)
-7. [🎯 Demo Guide](#-demo-guide)
+## Table of Contents
+1. [Core Features](#-core-features)
+2. [Tech Stack](#️-tech-stack)
+3. [Architecture & Engineering](#-architecture--engineering)
+4. [Security & Database Rules](#-security--database-rules)
+5. [Getting Started](#-getting-started)
+6. [Project Structure](#-project-structure)
+7. [Demo Guide](#-demo-guide)
 
 ---
 
-## ✨ Core Features
+## Core Features
 
-*   **📍 Geospatial Skill Discovery:** Find skilled individuals near you using our interactive map powered by Leaflet, OpenStreetMap, and Geohashing.
-*   **🤝 Flexible Exchange Modes:** Offer your skills for **Free**, set a **Price** (per hour/session/day), or propose a **Barter** trade.
-*   **💬 Real-Time Messaging:** Chat instantly with local experts. No page refreshes required, featuring real-time unread badge counters.
-*   **📅 Smart Booking System:** Send, accept, decline, and manage booking requests with built-in conflict detection to prevent double-booking.
-*   **🔔 Live Notifications:** Receive instant in-app alerts for new messages, booking updates, and profile reviews.
-*   **⭐ Ratings & Reviews:** Build trust within the community through a robust rating system.
-*   **✨ Premium UX/UI:** Features skeleton loaders, smooth fade-in animations, modern toast notifications, and debounced search inputs.
+*   **Geospatial Skill Discovery:** Find skilled individuals near you using our interactive map powered by Leaflet, OpenStreetMap, and Geohashing.
+*   **Flexible Exchange Modes:** Offer your skills for **Free**, set a **Price** (per hour/session/day), or propose a **Barter** trade.
+*   **Real-Time Messaging:** Chat instantly with local experts. No page refreshes required, featuring real-time unread badge counters.
+*   **Smart Booking System:** Send, accept, decline, and manage booking requests with built-in conflict detection to prevent double-booking.
+*   **Live Notifications:** Receive instant in-app alerts for new messages, booking updates, and profile reviews.
+*   **Ratings & Reviews:** Build trust within the community through a robust rating system.
+*   **Premium UX/UI:** Features skeleton loaders, smooth fade-in animations, modern toast notifications, and debounced search inputs.
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 *   **Frontend:** Next.js (App Router), React 18
 *   **Styling:** Tailwind CSS, `react-hot-toast` (Notifications)
@@ -45,7 +45,7 @@ Built with 💙 by **Team Bit Benders**.
 
 ---
 
-## 🧠 Architecture & Engineering
+## Architecture & Engineering
 
 SkillHub solves several complex engineering challenges under the hood:
 
@@ -67,7 +67,7 @@ We intercept the Google Sign-In flow to check if a user's `onboardingComplete` f
 
 ---
 
-## 🔒 Security & Database Rules
+## Security & Database Rules
 
 The Firestore database is strictly locked down using custom security rules to prevent unauthorized reads and writes.
 
@@ -83,7 +83,7 @@ The Firestore database is strictly locked down using custom security rules to pr
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 Follow these steps to run SkillHub on your local machine.
 
