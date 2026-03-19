@@ -11,13 +11,14 @@ import {
 import { geohashQueryBounds, distanceBetween } from "geofire-common";
 import { db } from "./firebase";
 
-// Search nearby skills (with pagination)
+// Search nearby skills (with pagination and rating)
 export async function searchNearbySkills(
   centerLat,
   centerLng,
   radiusInKm,
   categoryFilter,
   priceTypeFilter,
+  minRatingFilter = 0,
   pageSize = 20,
   existingResults = []
 ) {
@@ -71,6 +72,12 @@ export async function searchNearbySkills(
           if (!hasPriceType) continue;
         }
 
+        // filter by minimum rating
+        if (minRatingFilter > 0) {
+          const userRating = data.averageRating || 0;
+          if (userRating < minRatingFilter) continue;
+        }
+
         if (
           !results.find((r) => r.id === docSnap.id) &&
           !existingIds.has(docSnap.id)
@@ -89,7 +96,12 @@ export async function searchNearbySkills(
 }
 
 // Search by skill name (with pagination)
-export async function searchBySkillName(keyword, lastDoc = null, pageSize = 20) {
+export async function searchBySkillName(
+  keyword, 
+  minRatingFilter = 0,
+  lastDoc = null, 
+  pageSize = 20
+) {
   const usersRef = collection(db, "users");
 
   let q;
@@ -106,6 +118,13 @@ export async function searchBySkillName(keyword, lastDoc = null, pageSize = 20) 
 
   snapshot.forEach((docSnap) => {
     const data = docSnap.data();
+    
+    // filter by minimum rating
+    if (minRatingFilter > 0) {
+      const userRating = data.averageRating || 0;
+      if (userRating < minRatingFilter) return; // return acts like continue inside a for-each loop
+    }
+
     const matchingSkills = data.skillsOffered?.filter(
       (s) =>
         s.name.toLowerCase().includes(keywordLower) ||

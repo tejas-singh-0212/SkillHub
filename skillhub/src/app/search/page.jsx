@@ -42,6 +42,7 @@ function SearchContent() {
   );
   const [radius, setRadius] = useState(25);
   const [priceType, setPriceType] = useState("");
+  const [minRating, setMinRating] = useState(0);
 
   useEffect(() => {
     getCurrentLocation()
@@ -79,6 +80,7 @@ function SearchContent() {
           radius,
           category,
           priceType,
+          minRating,
           PAGE_SIZE,
           isLoadMore ? results : []
         );
@@ -89,6 +91,7 @@ function SearchContent() {
       if (queryText.trim()) {
         const textResult = await searchBySkillName(
           queryText,
+          minRating,
           isLoadMore ? lastDoc : null,
           PAGE_SIZE
         );
@@ -214,9 +217,21 @@ function SearchContent() {
             className="border rounded-lg px-3 py-2"
           >
             <option value="">Any Price</option>
-            <option value="free">🆓 Free</option>
-            <option value="barter">🔄 Barter</option>
-            <option value="paid">💰 Paid</option>
+            <option value="free">Free</option>
+            <option value="barter">Barter</option>
+            <option value="paid">Paid</option>
+          </select>
+
+           {/* rating Filter */}
+          <select
+            value={minRating}
+            onChange={(e) => setMinRating(Number(e.target.value))}
+            className="border rounded-lg px-3 py-2"
+          >
+            <option value={0}>Any Rating</option>
+            <option value={4.5}>⭐ 4.5 & up</option>
+            <option value={4.0}>⭐ 4.0 & up</option>
+            <option value={3.0}>⭐ 3.0 & up</option>
           </select>
 
           <button

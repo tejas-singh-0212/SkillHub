@@ -4,6 +4,7 @@
 ![Firebase](https://img.shields.io/badge/Firebase-v10-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 ![Leaflet](https://img.shields.io/badge/Leaflet-199900?style=for-the-badge&logo=Leaflet&logoColor=white)
+![ImgBB API](https://img.shields.io/badge/ImgBB-API-00B8FF?style=for-the-badge)
 
 **SkillHub** is a modern, real-time marketplace where community members can connect to teach, learn, barter, or monetize their skills locally. Whether you want to trade guitar lessons for coding help, or simply hire a local tutor, SkillHub makes it effortless.
 
@@ -98,7 +99,7 @@ npm install
 ```
 ### 3. Configure Environment Variables
 Create a `.env.local` file in the root directory and add your Firebase credentials:
-# Firebase Configuration
+### Firebase Configuration
 ```bash
 NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_auth_domain
@@ -107,7 +108,7 @@ NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_storage_bucket
 NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
 NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
 ```
-# Image Hosting Configuration
+### Image Hosting Configuration
 ```bash
 NEXT_PUBLIC_IMGBB_API_KEY=your_imgbb_api_key
 ```
