@@ -1,6 +1,7 @@
 "use client";
 
 import type { Review } from "@/types";
+import Image from "next/image";
 
 interface ReviewListProps {
   reviews: Review[];
@@ -21,9 +22,11 @@ export default function ReviewList({ reviews }: ReviewListProps) {
       {reviews.map((review) => (
         <div key={review.id} className="bg-white border rounded-xl p-4">
           <div className="flex items-center gap-3 mb-2">
-            <img
+            <Image
+              unoptimized
               src={review.reviewerAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(review.reviewerName || "U")}&background=random`}
               alt=""
+              width={40} height={40}
               className="w-10 h-10 rounded-full object-cover"
             />
             <div>

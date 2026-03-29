@@ -10,6 +10,7 @@ import {
 import L from "leaflet";
 import { useEffect } from "react";
 import type { MapPerson } from "@/types";
+import Image from "next/image";
 
 const userIcon = L.icon({
   iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png",
@@ -90,8 +91,10 @@ export default function MapView({
           <Popup>
             <div className="min-w-[180px]">
               <div className="flex items-center gap-2 mb-1">
-                <img
+                <Image
+                  unoptimized
                   src={person.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(person.name || "U")}&background=random&size=40`}
+                  width={32} height={32}
                   className="w-8 h-8 rounded-full object-cover"
                   alt=""
                 />

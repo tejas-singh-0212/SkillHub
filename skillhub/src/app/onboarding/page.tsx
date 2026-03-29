@@ -342,7 +342,7 @@ export default function OnboardingPage() {
                     </p>
                     {skill.description && (
                       <p className="text-sm text-gray-500 mt-1 italic">
-                        "{skill.description}"
+                        &quot;{skill.description}&quot;
                       </p>
                     )}
                   </div>
@@ -540,7 +540,7 @@ export default function OnboardingPage() {
                     </p>
                     {skill.description && (
                       <p className="text-sm text-gray-500 mt-1 italic">
-                        "{skill.description}"
+                        &quot;{skill.description}&quot;
                       </p>
                     )}
                   </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "./AuthProvider";
+import Image from "next/image";
 import type { Conversation } from "@/types";
 
 interface ConversationListProps {
@@ -38,7 +39,7 @@ export default function ConversationList({ conversations, selectedId, onSelect }
             onClick={() => onSelect(convo)}
             className={`flex items-center gap-3 p-4 cursor-pointer hover:bg-gray-50 transition ${selectedId === convo.id ? "bg-blue-50" : ""}`}
           >
-            <img src={otherAvatar} alt="" className="w-12 h-12 rounded-full object-cover" />
+            <Image unoptimized src={otherAvatar} alt="" width={48} height={48} className="w-12 h-12 rounded-full object-cover" />
             <div className="flex-1 min-w-0">
               <div className="flex justify-between items-center">
                 <h3 className="font-semibold text-sm truncate">{otherName}</h3>

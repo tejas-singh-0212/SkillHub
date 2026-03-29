@@ -1,6 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { formatLocationDisplay } from "@/lib/location";
+import Image from "next/image";
 import type { SearchResult } from "@/types";
 
 interface UserCardProps {
@@ -16,9 +17,11 @@ export default function UserCard({ user }: UserCardProps) {
       className="bg-white border rounded-xl p-5 hover:shadow-lg cursor-pointer transition"
     >
       <div className="flex items-center gap-3 mb-3">
-        <img
+        <Image
+          unoptimized
           src={user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || "U")}&background=random`}
           alt=""
+          width={48} height={48}
           className="w-12 h-12 rounded-full object-cover"
         />
         <div>

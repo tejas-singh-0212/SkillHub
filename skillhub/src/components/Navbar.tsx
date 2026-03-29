@@ -5,6 +5,7 @@ import { useAuth } from "./AuthProvider";
 import { logOut } from "@/lib/auth";
 import { useRouter, usePathname } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import NotificationBell from "./NotificationBell";
 
 export default function Navbar() {
@@ -74,12 +75,14 @@ export default function Navbar() {
                       onClick={() => setMenuOpen(!menuOpen)}
                       className="flex items-center gap-2 bg-gray-100 rounded-full pl-1 pr-3 py-1 hover:bg-gray-200 transition"
                     >
-                      <img
+                      <Image
+                        unoptimized
                         src={
                           profile?.avatar ||
                           `https://ui-avatars.com/api/?name=U&background=random`
                         }
                         alt=""
+                        width={32} height={32}
                         className="w-8 h-8 rounded-full object-cover"
                       />
                       <span className="text-sm font-medium">

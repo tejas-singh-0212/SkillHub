@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import {
   listenToReceivedBookings,
   listenToSentBookings,
@@ -194,7 +195,7 @@ export default function BookingsPage() {
           <p className="text-gray-600 mb-4">
             {tab === "received"
               ? "When someone books your skills, it will appear here."
-              : "Book someone's skills from their profile to get started."}
+              : "Book someone&apos;s skills from their profile to get started."}
           </p>
           <button
             onClick={() => router.push("/search")}
@@ -212,7 +213,8 @@ export default function BookingsPage() {
             >
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
-                  <img
+                  <Image
+                    unoptimized
                     src={
                       tab === "received"
                         ? booking.requesterAvatar ||
@@ -225,6 +227,7 @@ export default function BookingsPage() {
                           )}&background=random`
                     }
                     alt=""
+                    width={48} height={48}
                     className="w-12 h-12 rounded-full object-cover"
                   />
                   <div>

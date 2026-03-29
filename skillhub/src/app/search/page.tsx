@@ -57,6 +57,7 @@ function SearchContent() {
     if (category && userLocation) {
       handleSearch();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userLocation]);
 
   const handleSearch = async (isLoadMore = false) => {
@@ -93,7 +94,7 @@ function SearchContent() {
         const textResult = await searchBySkillName(
           queryText,
           minRating,
-          isLoadMore ? lastDoc as null : null,
+          isLoadMore ? (lastDoc as import("firebase/firestore").DocumentSnapshot) : null,
           PAGE_SIZE
         );
 

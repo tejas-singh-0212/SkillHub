@@ -4,6 +4,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { listenToMyBookings } from "@/lib/bookings";
 import { getSmartMatches } from "@/lib/search";
 import { DashboardSkeleton } from "@/components/Skeletons";
@@ -183,7 +184,8 @@ export default function DashboardPage() {
                 className="bg-white border rounded-xl p-4 hover:shadow-lg transition"
               >
                 <div className="flex items-center gap-3 mb-2">
-                  <img
+                  <Image
+                    unoptimized
                     src={
                       match.avatar ||
                       `https://ui-avatars.com/api/?name=${encodeURIComponent(
@@ -191,6 +193,7 @@ export default function DashboardPage() {
                       )}&background=random`
                     }
                     alt=""
+                    width={40} height={40}
                     className="w-10 h-10 rounded-full object-cover"
                   />
                   <div>
@@ -229,7 +232,7 @@ export default function DashboardPage() {
             </p>
             {skill.description && (
               <p className="text-sm text-gray-500 mt-2 italic line-clamp-2">
-                "{skill.description}"
+                &quot;{skill.description}&quot;
               </p>
             )}
             <p className="text-sm mt-2">

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { getUserProfile } from "@/lib/auth";
+import Image from "next/image";
 import { getReviewsForUser } from "@/lib/reviews";
 import { createConversation } from "@/lib/messages";
 import { useAuth } from "@/components/AuthProvider";
@@ -90,7 +91,8 @@ export default function ProfilePage() {
       {/* Profile Header */}
       <div className="bg-white rounded-2xl border p-6 sm:p-8 mb-6">
         <div className="flex flex-col sm:flex-row items-start gap-6">
-          <img
+          <Image
+            unoptimized
             src={
               profileData.avatar ||
               `https://ui-avatars.com/api/?name=${encodeURIComponent(
@@ -98,6 +100,7 @@ export default function ProfilePage() {
               )}&background=random&size=200`
             }
             alt=""
+            width={128} height={128}
             className="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-gray-200"
           />
 
@@ -196,7 +199,7 @@ export default function ProfilePage() {
                   </span>
                   {skill.description && (
                     <p className="text-sm text-gray-600 mt-1 italic">
-                      "{skill.description}"
+                      &quot;{skill.description}&quot;
                     </p>
                   )}
                 </div>

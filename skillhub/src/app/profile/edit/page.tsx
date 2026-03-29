@@ -21,6 +21,7 @@ import {
 import { getCurrentLocation, toClientLocation, formatLocationDisplay } from "@/lib/location";
 import dynamic from "next/dynamic";
 import toast from "react-hot-toast";
+import Image from "next/image";
 import type { ClientLocation, SkillOffered, SkillNeeded } from "@/types";
 
 const LocationPicker = dynamic(
@@ -258,12 +259,14 @@ const [uploadingImage, setUploadingImage] = useState(false);
         <h2 className="text-lg font-bold mb-4">👤 Basic Information</h2>
                 {/* profile picture upload */}
         <div className="flex flex-col sm:flex-row items-center gap-4 mb-6 pb-6 border-b">
-          <img
+          <Image
+            unoptimized
             src={
               profile.avatar ||
               `https://ui-avatars.com/api/?name=${encodeURIComponent(name || "U")}&background=random`
             }
             alt="Profile"
+            width={96} height={96}
             className="w-24 h-24 rounded-full object-cover border-4 border-gray-100"
           />
           <div>
@@ -342,7 +345,7 @@ const [uploadingImage, setUploadingImage] = useState(false);
         </button>
 
         <LocationPicker
-          onLocationSelect={(loc) => setLocation(loc)}
+          onLocationSelect={(loc: ClientLocation) => setLocation(loc)}
           initialLocation={location}
         />
 
@@ -510,7 +513,7 @@ const [uploadingImage, setUploadingImage] = useState(false);
                     </p>
                     {skill.description && (
                       <p className="text-sm text-gray-500 mt-1 italic">
-                        "{skill.description}"
+                        &quot;{skill.description}&quot;
                       </p>
                     )}
                   </div>
@@ -735,7 +738,7 @@ const [uploadingImage, setUploadingImage] = useState(false);
                     <p className="text-sm text-gray-600">{skill.category}</p>
                     {skill.description && (
                       <p className="text-sm text-gray-500 mt-1 italic">
-                        "{skill.description}"
+                        &quot;{skill.description}&quot;
                       </p>
                     )}
                   </div>

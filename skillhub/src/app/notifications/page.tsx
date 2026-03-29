@@ -153,7 +153,7 @@ export default function NotificationsPage() {
           </div>
           <h3 className="text-xl font-bold mb-2">No notifications yet</h3>
           <p className="text-gray-600">
-            When you receive bookings, messages, or reviews, they'll appear
+            When you receive bookings, messages, or reviews, they&apos;ll appear
             here.
           </p>
         </div>

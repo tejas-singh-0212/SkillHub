@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { useRouter, useSearchParams } from "next/navigation";
 import { listenToConversations, markAsRead } from "@/lib/messages";
+import Image from "next/image";
 import ConversationList from "@/components/ConversationList";
 import ChatWindow from "@/components/ChatWindow";
 import { MessagesSkeleton } from "@/components/Skeletons";
@@ -39,7 +40,7 @@ function MessagesContent() {
     });
 
     return () => unsub();
-  }, [user, searchParams]);
+  }, [user, searchParams, selectedConvo]);
 
   const handleSelectConvo = async (convo: Conversation) => {
     setSelectedConvo(convo);
@@ -103,7 +104,8 @@ function MessagesContent() {
             {/* Desktop chat header */}
             {selectedConvo && (
               <div className="hidden sm:flex border-b p-4 items-center gap-3 shrink-0">
-                <img
+                <Image
+                  unoptimized
                   src={
                     selectedConvo.participantAvatars?.[
                       selectedConvo.participants?.find((p: string) => p !== user?.uid) || ""
@@ -111,6 +113,7 @@ function MessagesContent() {
                     `https://ui-avatars.com/api/?name=U&background=random`
                   }
                   alt=""
+                  width={40} height={40}
                   className="w-10 h-10 rounded-full object-cover"
                 />
                 <div>
