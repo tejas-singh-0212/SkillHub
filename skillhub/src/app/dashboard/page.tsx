@@ -147,11 +147,11 @@ export default function DashboardPage() {
  key={booking.id}
  className="bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-xl p-4 flex items-center gap-4"
  >
- <div className="bg-blue-100 rounded-lg p-3 text-center min-w-[60px]">
- <p className="text-xs text-blue-600 font-medium">
+ <div className="bg-blue-100 dark:bg-blue-900/40 rounded-lg p-3 text-center min-w-[60px]">
+ <p className="text-xs text-blue-600 dark:text-blue-300 font-medium">
  {booking.scheduledDate}
  </p>
- <p className="text-sm font-bold text-blue-800">
+ <p className="text-sm font-bold text-blue-800 dark:text-blue-400">
  {booking.scheduledTime}
  </p>
  </div>
@@ -199,7 +199,7 @@ export default function DashboardPage() {
  <div>
  <p className="font-semibold text-sm">{match.name}</p>
  {match.matchType === "perfect_barter" && (
- <span className="text-xs bg-green-100 text-green-700 dark:text-green-300 px-2 py-0.5 rounded-full">
+ <span className="text-xs bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 px-2 py-0.5 rounded-full">
  🔄 Perfect Match
  </span>
  )}
