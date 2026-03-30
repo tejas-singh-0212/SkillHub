@@ -7,6 +7,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import NotificationBell from "./NotificationBell";
+import { ThemeToggle } from "./ThemeToggle";
 
 export default function Navbar() {
   const { user, profile, loading } = useAuth();
@@ -66,7 +67,8 @@ export default function Navbar() {
                     ))}
                   </div>
 
-                  <div className="ml-2">
+                  <div className="ml-2 flex items-center gap-2">
+                    <ThemeToggle />
                     <NotificationBell />
                   </div>
 
@@ -119,6 +121,7 @@ export default function Navbar() {
                 </>
               ) : (
                 <div className="flex items-center gap-3">
+                  <ThemeToggle />
                   <Link
                     href="/login"
                     className="text-gray-600 hover:text-blue-600 transition font-medium px-4 py-2"
@@ -137,6 +140,7 @@ export default function Navbar() {
           )}
 
           <div className="md:hidden flex items-center gap-2">
+            <ThemeToggle />
             {user && <NotificationBell />}
             <button
               onClick={() => setMenuOpen(!menuOpen)}
