@@ -22,13 +22,13 @@ export default function HomePage() {
  <div className="flex flex-wrap gap-4">
  {!loading && !user ? (
  <>
- <Link href="/register" className="bg-yellow-400 text-gray-900 dark:text-white px-8 py-4 rounded-xl text-lg font-bold hover:bg-yellow-300 transition shadow-lg dark:shadow-none">Get Started for Free</Link>
- <Link href="/search" className="bg-white dark:bg-gray-800/10 backdrop-blur text-white px-8 py-4 rounded-xl text-lg font-medium hover:bg-white dark:bg-gray-800/20 transition border dark:border-gray-700 border-white/30">Explore Skills</Link>
+ <Link href="/register" className="bg-yellow-400 text-black px-8 py-4 rounded-xl text-lg font-bold hover:bg-yellow-300 transition shadow-lg dark:shadow-none">Get Started for Free</Link>
+ <Link href="/search" className="bg-white dark:bg-gray-800/10 backdrop-blur text-black dark:text-white px-8 py-4 rounded-xl text-lg font-medium hover:bg-gray-100 dark:hover:bg-gray-800/20 transition border dark:border-gray-700 border-white/30">Explore Skills</Link>
  </>
  ) : !loading && user ? (
  <>
- <Link href="/search" className="bg-yellow-400 text-gray-900 dark:text-white px-8 py-4 rounded-xl text-lg font-bold hover:bg-yellow-300 transition shadow-lg dark:shadow-none">Find Skills Near You</Link>
- <Link href="/dashboard" className="bg-white dark:bg-gray-800/10 text-white px-8 py-4 rounded-xl text-lg font-medium hover:bg-white dark:bg-gray-800/20 transition border dark:border-gray-700 border-white/30">My Dashboard</Link>
+ <Link href="/search" className="bg-yellow-400 text-black px-8 py-4 rounded-xl text-lg font-bold hover:bg-yellow-300 transition shadow-lg dark:shadow-none">Find Skills Near You</Link>
+ <Link href="/dashboard" className="bg-white dark:bg-gray-800/10 text-black dark:text-white px-8 py-4 rounded-xl text-lg font-medium hover:bg-gray-100 dark:hover:bg-gray-800/20 transition border dark:border-gray-700 border-white/30">My Dashboard</Link>
  </>
  ) : null}
  </div>

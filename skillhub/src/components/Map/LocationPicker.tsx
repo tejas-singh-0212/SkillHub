@@ -180,7 +180,7 @@ export default function LocationPicker({ onLocationSelect, initialLocation }: Lo
  {showSuggestions && suggestions.length > 0 && (
  <div className="absolute w-full mt-1 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-xl shadow-lg dark:shadow-none max-h-60 overflow-y-auto" style={{ zIndex: 20 }}>
  {suggestions.map((suggestion, index) => (
- <div key={index} onClick={() => handleSuggestionClick(suggestion)} className="px-4 py-3 hover:bg-blue-50 cursor-pointer border-b dark:border-gray-700 last:border-b-0 transition">
+ <div key={index} onClick={() => handleSuggestionClick(suggestion)} className="px-4 py-3 hover:bg-blue-50 dark:hover:bg-blue-900/30 cursor-pointer border-b dark:border-gray-700 last:border-b-0 transition">
  <div className="flex items-start gap-2">
  <span className="text-gray-400 mt-0.5">📍</span>
  <div className="flex-1 min-w-0">
@@ -221,11 +221,11 @@ export default function LocationPicker({ onLocationSelect, initialLocation }: Lo
  </MapContainer>
  </div>
  {selected && selected.lat && selected.lng && (
- <div className="bg-green-50 border dark:border-gray-700 border-green-200 rounded-xl p-3 mt-3">
+ <div className="bg-green-50 dark:bg-green-900/30 border dark:border-gray-700 border-green-200 rounded-xl p-3 mt-3">
  <div className="flex items-center justify-between">
  <div className="flex-1 min-w-0">
- <p className="text-green-700 font-medium text-sm">✅ Location set</p>
- <p className="text-green-600 text-sm mt-0.5 truncate">
+ <p className="text-green-700 dark:text-green-300 font-medium text-sm">✅ Location set</p>
+ <p className="text-green-600 dark:text-green-400 text-sm mt-0.5 truncate">
  {selected.fullAddress
  ? selected.fullAddress.length > 80 ? selected.fullAddress.substring(0, 80) + "..." : selected.fullAddress
  : selected.city
