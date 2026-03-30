@@ -6,6 +6,11 @@ body {
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
+/* Force specific HTML elements to adopt dark mode appropriately */
+input, select, textarea {
+  @apply bg-transparent dark:bg-gray-800 text-gray-900 dark:text-white;
+}
+
 
 .leaflet-container {
   width: 100%;

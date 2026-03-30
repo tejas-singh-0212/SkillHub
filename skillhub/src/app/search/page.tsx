@@ -186,13 +186,13 @@ function SearchContent() {
  value={queryText}
  onChange={(e) => setQueryText(e.target.value)}
  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
- className="flex-1 min-w-[200px] border dark:border-gray-700 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+ className="flex-1 min-w-[200px] border dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
  />
 
  <select
  value={category}
  onChange={(e) => setCategory(e.target.value)}
- className="border dark:border-gray-700 rounded-lg px-3 py-2"
+ className="border dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg px-3 py-2"
  >
  <option value="">All Categories</option>
  {SKILL_CATEGORIES.map((cat) => (
@@ -205,7 +205,7 @@ function SearchContent() {
  <select
  value={radius}
  onChange={(e) => setRadius(Number(e.target.value))}
- className="border dark:border-gray-700 rounded-lg px-3 py-2"
+ className="border dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg px-3 py-2"
  >
  <option value={5}>Within 5 km</option>
  <option value={10}>Within 10 km</option>
@@ -216,7 +216,7 @@ function SearchContent() {
  <select
  value={priceType}
  onChange={(e) => setPriceType(e.target.value)}
- className="border dark:border-gray-700 rounded-lg px-3 py-2"
+ className="border dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg px-3 py-2"
  >
  <option value="">Any Price</option>
  <option value="free">Free</option>
@@ -228,7 +228,7 @@ function SearchContent() {
  <select
  value={minRating}
  onChange={(e) => setMinRating(Number(e.target.value))}
- className="border dark:border-gray-700 rounded-lg px-3 py-2"
+ className="border dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg px-3 py-2"
  >
  <option value={0}>Any Rating</option>
  <option value={4.5}>⭐ 4.5 & up</option>

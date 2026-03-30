@@ -19,12 +19,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
  />
  </head>
- <body>
+ <body className="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 antialiased transition-colors duration-200">
  <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
  <Toaster position="top-center" />
  <AuthProvider>
  <Navbar />
- <main className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">{children}</main>
+ <main className="min-h-screen">{children}</main>
  </AuthProvider>
  </ThemeProvider>
  </body>

@@ -45,7 +45,7 @@ export default function HomePage() {
  { icon: "🤝", title: "Connect & Exchange", desc: "Book sessions, chat directly, barter or pay, your choice." },
  ].map((item, i) => (
  <div key={i} className="text-center">
- <div className="w-20 h-20 bg-blue-100 rounded-2xl flex items-center justify-center text-4xl mx-auto mb-5">{item.icon}</div>
+ <div className="w-20 h-20 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center text-4xl mx-auto mb-5">{item.icon}</div>
  <h3 className="text-xl font-bold mb-3">{item.title}</h3>
  <p className="text-gray-600 dark:text-gray-300 leading-relaxed">{item.desc}</p>
  </div>
@@ -72,9 +72,9 @@ export default function HomePage() {
  <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Three Ways to Exchange</h2>
  <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
  {[
- { icon: "🆓", title: "Free", desc: "Share your skills with the community for free", color: "bg-green-50 border-green-200" },
- { icon: "🔄", title: "Barter", desc: "Trade your skills with others without any money involved", color: "bg-blue-50 border-blue-200" },
- { icon: "💰", title: "Paid", desc: "Set your own rates and earn from your skills", color: "bg-yellow-50 border-yellow-200" },
+ { icon: "🆓", title: "Free", desc: "Share your skills with the community for free", color: "bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800" },
+ { icon: "🔄", title: "Barter", desc: "Trade your skills with others without any money involved", color: "bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800" },
+ { icon: "💰", title: "Paid", desc: "Set your own rates and earn from your skills", color: "bg-yellow-50 dark:bg-yellow-900/30 border-yellow-200 dark:border-yellow-800" },
  ].map((item, i) => (
  <div key={i} className={`${item.color} border-2 rounded-2xl p-8 text-center`}>
  <div className="text-5xl mb-4">{item.icon}</div>

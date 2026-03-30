@@ -110,7 +110,7 @@ export default function ProfilePage() {
  {profileData.name}
  </h1>
  {profileData.isVerified && (
- <span className="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full">
+ <span className="bg-blue-100 text-blue-700 dark:text-blue-300 text-xs px-2 py-1 rounded-full">
  ✅ Verified
  </span>
  )}
@@ -192,7 +192,7 @@ export default function ProfilePage() {
  return (
  <div
  key={i}
- className="bg-green-50 border dark:border-gray-700 border-green-200 rounded-xl px-4 py-3 w-full sm:w-auto"
+ className="bg-green-50 dark:bg-green-900/30 border dark:border-gray-700 border-green-200 rounded-xl px-4 py-3 w-full sm:w-auto"
  >
  <span className="font-medium">
  {cat?.icon} {skill.name}

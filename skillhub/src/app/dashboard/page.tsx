@@ -78,7 +78,7 @@ export default function DashboardPage() {
  <p className="text-gray-600 dark:text-gray-300 text-sm mt-1">Completed</p>
  </div>
  <div className="bg-white dark:bg-gray-800 rounded-xl p-5 border dark:border-gray-700">
- <p className="text-3xl font-bold text-yellow-600">
+ <p className="text-3xl font-bold text-yellow-600 dark:text-yellow-400">
  ⭐ {profile.averageRating || "N/A"}
  </p>
  <p className="text-gray-600 dark:text-gray-300 text-sm mt-1">
@@ -92,45 +92,45 @@ export default function DashboardPage() {
  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
  <Link
  href="/search"
- className="bg-blue-50 hover:bg-blue-100 rounded-xl p-5 text-center transition border dark:border-gray-700 border-blue-200"
+ className="bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-800/40 rounded-xl p-5 text-center transition border dark:border-gray-700 border-blue-200"
  >
  <p className="text-3xl mb-2">🔍</p>
- <p className="font-semibold text-blue-700 text-sm">Find Skills</p>
+ <p className="font-semibold text-blue-700 dark:text-blue-300 text-sm">Find Skills</p>
  </Link>
  <Link
  href={`/profile/${user!.uid}`}
- className="bg-purple-50 hover:bg-purple-100 rounded-xl p-5 text-center transition border dark:border-gray-700 border-purple-200"
+ className="bg-purple-50 dark:bg-purple-900/30 hover:bg-purple-100 dark:hover:bg-purple-800/40 rounded-xl p-5 text-center transition border dark:border-gray-700 border-purple-200"
  >
  <p className="text-3xl mb-2">👤</p>
- <p className="font-semibold text-purple-700 text-sm">My Profile</p>
+ <p className="font-semibold text-purple-700 dark:text-purple-300 text-sm">My Profile</p>
  </Link>
  <Link
  href="/messages"
- className="bg-green-50 hover:bg-green-100 rounded-xl p-5 text-center transition border dark:border-gray-700 border-green-200"
+ className="bg-green-50 dark:bg-green-900/30 hover:bg-green-100 dark:hover:bg-green-800/40 rounded-xl p-5 text-center transition border dark:border-gray-700 border-green-200"
  >
  <p className="text-3xl mb-2">💬</p>
- <p className="font-semibold text-green-700 text-sm">Messages</p>
+ <p className="font-semibold text-green-700 dark:text-green-300 text-sm">Messages</p>
  </Link>
  <Link
  href="/bookings"
- className="bg-yellow-50 hover:bg-yellow-100 rounded-xl p-5 text-center transition border dark:border-gray-700 border-yellow-200"
+ className="bg-yellow-50 dark:bg-yellow-900/30 hover:bg-yellow-100 dark:hover:bg-yellow-800/40 rounded-xl p-5 text-center transition border dark:border-gray-700 border-yellow-200"
  >
  <p className="text-3xl mb-2">📅</p>
- <p className="font-semibold text-yellow-700 text-sm">Bookings</p>
+ <p className="font-semibold text-yellow-700 dark:text-yellow-300 text-sm">Bookings</p>
  </Link>
  </div>
 
  {/* Pending Bookings Alert */}
  {pendingBookings.filter((b) => b.role === "provider").length > 0 && (
- <div className="bg-orange-50 border dark:border-gray-700 border-orange-200 rounded-xl p-4 mb-8">
- <h3 className="font-bold text-orange-700">
+ <div className="bg-orange-50 dark:bg-orange-900/30 border dark:border-gray-700 border-orange-200 rounded-xl p-4 mb-8">
+ <h3 className="font-bold text-orange-700 dark:text-orange-300">
  📩 You have{" "}
  {pendingBookings.filter((b) => b.role === "provider").length} pending
  booking request(s)!
  </h3>
  <Link
  href="/bookings"
- className="text-orange-600 text-sm underline mt-1 inline-block"
+ className="text-orange-600 dark:text-orange-400 text-sm underline mt-1 inline-block"
  >
  Review them →
  </Link>
@@ -199,7 +199,7 @@ export default function DashboardPage() {
  <div>
  <p className="font-semibold text-sm">{match.name}</p>
  {match.matchType === "perfect_barter" && (
- <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+ <span className="text-xs bg-green-100 text-green-700 dark:text-green-300 px-2 py-0.5 rounded-full">
  🔄 Perfect Match
  </span>
  )}
@@ -209,7 +209,7 @@ export default function DashboardPage() {
  {match.skillsOffered?.slice(0, 2).map((s, i) => (
  <span
  key={i}
- className="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full"
+ className="text-xs bg-blue-50 dark:bg-blue-900/30 text-blue-600 px-2 py-0.5 rounded-full"
  >
  {s.name}
  </span>

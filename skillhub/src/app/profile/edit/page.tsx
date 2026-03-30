@@ -271,7 +271,7 @@ const [uploadingImage, setUploadingImage] = useState(false);
  />
  <div>
  <p className="font-medium mb-1">Profile Picture</p>
- <label className={`cursor-pointer bg-blue-50 text-blue-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-100 transition inline-block ${uploadingImage ? 'opacity-50 pointer-events-none' : ''}`}>
+ <label className={`cursor-pointer bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-100 dark:hover:bg-blue-800/40 transition inline-block ${uploadingImage ? 'opacity-50 pointer-events-none' : ''}`}>
  {uploadingImage ? "Uploading..." : "📷 Change Photo"}
  <input
  type="file"
@@ -339,7 +339,7 @@ const [uploadingImage, setUploadingImage] = useState(false);
  <button
  onClick={handleAutoDetect}
  disabled={detectingLocation}
- className="w-full border-2 border-dashed border-blue-300 rounded-xl py-3 text-blue-600 font-medium hover:bg-blue-50 transition disabled:opacity-50 mb-4"
+ className="w-full border-2 border-dashed border-blue-300 rounded-xl py-3 text-blue-600 dark:text-blue-400 font-medium hover:bg-blue-50 dark:bg-blue-900/30 transition disabled:opacity-50 mb-4"
  >
  {detectingLocation ? "Detecting..." : "📍 Auto-Detect Location"}
  </button>
@@ -374,9 +374,9 @@ const [uploadingImage, setUploadingImage] = useState(false);
  <div key={skill.id || i}>
  {/* Edit Mode */}
  {editingOffered === skill.id ? (
- <div className="border-2 border-blue-400 rounded-xl p-4 space-y-3 bg-blue-50">
+ <div className="border-2 border-blue-400 rounded-xl p-4 space-y-3 bg-blue-50 dark:bg-blue-900/30">
  <div className="flex items-center justify-between mb-1">
- <p className="text-sm font-semibold text-blue-700">✏️ Editing Skill</p>
+ <p className="text-sm font-semibold text-blue-700 dark:text-blue-300">✏️ Editing Skill</p>
  </div>
 
  <input
@@ -500,7 +500,7 @@ const [uploadingImage, setUploadingImage] = useState(false);
  </div>
  ) : (
  /* Display Mode */
- <div className="flex items-start justify-between bg-blue-50 rounded-xl p-4">
+ <div className="flex items-start justify-between bg-blue-50 dark:bg-blue-900/30 rounded-xl p-4">
  <div className="flex-1 min-w-0 mr-3">
  <p className="font-semibold">{skill.name}</p>
  <p className="text-sm text-gray-600 dark:text-gray-300">
@@ -520,13 +520,13 @@ const [uploadingImage, setUploadingImage] = useState(false);
  <div className="flex items-center gap-2 shrink-0">
  <button
  onClick={() => handleStartEditOffered(skill)}
- className="text-blue-500 hover:text-blue-700 text-sm font-medium px-2 py-1 rounded-lg hover:bg-blue-100 transition"
+ className="text-blue-500 hover:text-blue-700 dark:text-blue-300 text-sm font-medium px-2 py-1 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-800/40 transition"
  >
  Edit
  </button>
  <button
  onClick={() => handleRemoveOffered(skill)}
- className="text-red-400 hover:text-red-600 text-lg"
+ className="text-red-400 hover:text-red-600 dark:text-red-400 text-lg"
  >
  ✕
  </button>
@@ -539,7 +539,7 @@ const [uploadingImage, setUploadingImage] = useState(false);
 
  {/* Add New Offered Skill */}
  {showAddOffered ? (
- <div className="border-2 border-blue-200 rounded-xl p-4 space-y-3">
+ <div className="border-2 border-blue-200 dark:border-blue-800 rounded-xl p-4 space-y-3">
  <input
  type="text"
  placeholder="Skill name (e.g., Guitar Lessons)"
@@ -597,7 +597,7 @@ const [uploadingImage, setUploadingImage] = useState(false);
  }
  className={`p-2 rounded-lg border-2 text-sm font-medium ${
  newOffered.priceType === pt.id
- ? "border-blue-500 bg-blue-50"
+ ? "border-blue-500 bg-blue-50 dark:bg-blue-900/30"
  : "border-gray-200 dark:border-gray-700"
  }`}
  >
@@ -658,7 +658,7 @@ const [uploadingImage, setUploadingImage] = useState(false);
  setShowAddOffered(true);
  setEditingOffered(null);
  }}
- className="w-full border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl py-3 text-gray-600 dark:text-gray-300 hover:border-blue-400 hover:text-blue-600 transition"
+ className="w-full border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl py-3 text-gray-600 dark:text-gray-300 hover:border-blue-400 hover:text-blue-600 dark:text-blue-400 transition"
  >
  + Add Skill Offered
  </button>
@@ -674,7 +674,7 @@ const [uploadingImage, setUploadingImage] = useState(false);
  <div key={skill.id || i}>
  {/* Edit Mode */}
  {editingNeeded === skill.id ? (
- <div className="border-2 border-green-400 rounded-xl p-4 space-y-3 bg-green-50">
+ <div className="border-2 border-green-400 rounded-xl p-4 space-y-3 bg-green-50 dark:bg-green-900/30">
  <div className="flex items-center justify-between mb-1">
  <p className="text-sm font-semibold text-green-700">✏️ Editing Skill</p>
  </div>
@@ -732,7 +732,7 @@ const [uploadingImage, setUploadingImage] = useState(false);
  </div>
  ) : (
  /* Display Mode */
- <div className="flex items-start justify-between bg-green-50 rounded-xl p-4">
+ <div className="flex items-start justify-between bg-green-50 dark:bg-green-900/30 rounded-xl p-4">
  <div className="flex-1 min-w-0 mr-3">
  <p className="font-semibold">{skill.name}</p>
  <p className="text-sm text-gray-600 dark:text-gray-300">{skill.category}</p>
@@ -745,13 +745,13 @@ const [uploadingImage, setUploadingImage] = useState(false);
  <div className="flex items-center gap-2 shrink-0">
  <button
  onClick={() => handleStartEditNeeded(skill)}
- className="text-green-500 hover:text-green-700 text-sm font-medium px-2 py-1 rounded-lg hover:bg-green-100 transition"
+ className="text-green-500 hover:text-green-700 text-sm font-medium px-2 py-1 rounded-lg hover:bg-green-100 dark:hover:bg-green-800/40 transition"
  >
  Edit
  </button>
  <button
  onClick={() => handleRemoveNeeded(skill)}
- className="text-red-400 hover:text-red-600 text-lg"
+ className="text-red-400 hover:text-red-600 dark:text-red-400 text-lg"
  >
  ✕
  </button>
@@ -832,7 +832,7 @@ const [uploadingImage, setUploadingImage] = useState(false);
  <div className="text-center">
  <button
  onClick={() => router.push(`/profile/${user!.uid}`)}
- className="text-blue-600 font-medium hover:underline"
+ className="text-blue-600 dark:text-blue-400 font-medium hover:underline"
  >
  View My Public Profile →
  </button>
