@@ -11,133 +11,133 @@ import { MessagesSkeleton } from "@/components/Skeletons";
 import type { Conversation } from "@/types";
 
 function MessagesContent() {
-  const { user, loading: authLoading } = useAuth();
-  const router = useRouter();
-  const searchParams = useSearchParams();
+ const { user, loading: authLoading } = useAuth();
+ const router = useRouter();
+ const searchParams = useSearchParams();
 
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [selectedConvo, setSelectedConvo] = useState<Conversation | null>(null);
-  const [mobileShowChat, setMobileShowChat] = useState(false);
+ const [conversations, setConversations] = useState<Conversation[]>([]);
+ const [selectedConvo, setSelectedConvo] = useState<Conversation | null>(null);
+ const [mobileShowChat, setMobileShowChat] = useState(false);
 
-  useEffect(() => {
-    if (!authLoading && !user) router.push("/login");
-  }, [authLoading, user, router]);
+ useEffect(() => {
+ if (!authLoading && !user) router.push("/login");
+ }, [authLoading, user, router]);
 
-  useEffect(() => {
-    if (!user) return;
+ useEffect(() => {
+ if (!user) return;
 
-    const unsub = listenToConversations(user.uid, (convos) => {
-      setConversations(convos);
+ const unsub = listenToConversations(user.uid, (convos) => {
+ setConversations(convos);
 
-      const convoParam = searchParams.get("convo");
-      if (convoParam && !selectedConvo) {
-        const found = convos.find((c) => c.id === convoParam);
-        if (found) {
-          setSelectedConvo(found);
-          setMobileShowChat(true);
-        }
-      }
-    });
+ const convoParam = searchParams.get("convo");
+ if (convoParam && !selectedConvo) {
+ const found = convos.find((c) => c.id === convoParam);
+ if (found) {
+ setSelectedConvo(found);
+ setMobileShowChat(true);
+ }
+ }
+ });
 
-    return () => unsub();
-  }, [user, searchParams, selectedConvo]);
+ return () => unsub();
+ }, [user, searchParams, selectedConvo]);
 
-  const handleSelectConvo = async (convo: Conversation) => {
-    setSelectedConvo(convo);
-    setMobileShowChat(true);
+ const handleSelectConvo = async (convo: Conversation) => {
+ setSelectedConvo(convo);
+ setMobileShowChat(true);
 
-    if (user && convo.unreadCount?.[user.uid] > 0) {
-      await markAsRead(convo.id, user.uid);
-    }
-  };
+ if (user && convo.unreadCount?.[user.uid] > 0) {
+ await markAsRead(convo.id, user.uid);
+ }
+ };
 
-  if (authLoading) {
-    return <MessagesSkeleton />;
-  }
+ if (authLoading) {
+ return <MessagesSkeleton />;
+ }
 
-  return (
-    <div className="max-w-6xl mx-auto px-0 sm:px-6 py-0 sm:py-6">
-      <div className="bg-white rounded-none sm:rounded-2xl border-0 sm:border overflow-hidden">
-        <div className="flex h-[calc(100vh-64px)] sm:h-[calc(100vh-120px)] max-h-[700px]">
+ return (
+ <div className="max-w-6xl mx-auto px-0 sm:px-6 py-0 sm:py-6">
+ <div className="bg-white dark:bg-gray-800 rounded-none sm:rounded-2xl border-0 sm:border dark:border-gray-700 overflow-hidden">
+ <div className="flex h-[calc(100vh-64px)] sm:h-[calc(100vh-120px)] max-h-[700px]">
 
-          {/* Conversation List — Fixed header + scrollable list */}
-          <div
-            className={`w-full sm:w-80 border-r flex flex-col shrink-0 ${
-              mobileShowChat ? "hidden sm:flex" : "flex"
-            }`}
-          >
-            <div className="p-4 border-b shrink-0">
-              <h1 className="text-xl font-bold">Messages</h1>
-            </div>
-            <div className="flex-1 overflow-y-auto">
-              <ConversationList
-                conversations={conversations}
-                selectedId={selectedConvo?.id}
-                onSelect={handleSelectConvo}
-              />
-            </div>
-          </div>
+ {/* Conversation List — Fixed header + scrollable list */}
+ <div
+ className={`w-full sm:w-80 border-r flex flex-col shrink-0 ${
+ mobileShowChat ? "hidden sm:flex" : "flex"
+ }`}
+ >
+ <div className="p-4 border-b dark:border-gray-700 shrink-0">
+ <h1 className="text-xl font-bold">Messages</h1>
+ </div>
+ <div className="flex-1 overflow-y-auto">
+ <ConversationList
+ conversations={conversations}
+ selectedId={selectedConvo?.id}
+ onSelect={handleSelectConvo}
+ />
+ </div>
+ </div>
 
-          {/* Chat Window */}
-          <div
-            className={`flex-1 flex flex-col min-w-0 ${
-              mobileShowChat ? "flex" : "hidden sm:flex"
-            }`}
-          >
-            {/* Mobile back button */}
-            {mobileShowChat && selectedConvo && (
-              <div className="sm:hidden border-b p-3 flex items-center gap-3 shrink-0">
-                <button
-                  onClick={() => setMobileShowChat(false)}
-                  className="text-blue-600 font-medium"
-                >
-                  ← Back
-                </button>
-                <p className="font-semibold truncate">
-                  {selectedConvo.participantNames?.[
-                    selectedConvo.participants?.find((p: string) => p !== user?.uid) || ""
-                  ] || "Chat"}
-                </p>
-              </div>
-            )}
+ {/* Chat Window */}
+ <div
+ className={`flex-1 flex flex-col min-w-0 ${
+ mobileShowChat ? "flex" : "hidden sm:flex"
+ }`}
+ >
+ {/* Mobile back button */}
+ {mobileShowChat && selectedConvo && (
+ <div className="sm:hidden border-b dark:border-gray-700 p-3 flex items-center gap-3 shrink-0">
+ <button
+ onClick={() => setMobileShowChat(false)}
+ className="text-blue-600 font-medium"
+ >
+ ← Back
+ </button>
+ <p className="font-semibold truncate">
+ {selectedConvo.participantNames?.[
+ selectedConvo.participants?.find((p: string) => p !== user?.uid) || ""
+ ] || "Chat"}
+ </p>
+ </div>
+ )}
 
-            {/* Desktop chat header */}
-            {selectedConvo && (
-              <div className="hidden sm:flex border-b p-4 items-center gap-3 shrink-0">
-                <Image
-                  unoptimized
-                  src={
-                    selectedConvo.participantAvatars?.[
-                      selectedConvo.participants?.find((p: string) => p !== user?.uid) || ""
-                    ] ||
-                    `https://ui-avatars.com/api/?name=U&background=random`
-                  }
-                  alt=""
-                  width={40} height={40}
-                  className="w-10 h-10 rounded-full object-cover"
-                />
-                <div>
-                  <p className="font-semibold">
-                    {selectedConvo.participantNames?.[
-                      selectedConvo.participants?.find((p: string) => p !== user?.uid) || ""
-                    ] || "User"}
-                  </p>
-                </div>
-              </div>
-            )}
+ {/* Desktop chat header */}
+ {selectedConvo && (
+ <div className="hidden sm:flex border-b dark:border-gray-700 p-4 items-center gap-3 shrink-0">
+ <Image
+ unoptimized
+ src={
+ selectedConvo.participantAvatars?.[
+ selectedConvo.participants?.find((p: string) => p !== user?.uid) || ""
+ ] ||
+ `https://ui-avatars.com/api/?name=U&background=random`
+ }
+ alt=""
+ width={40} height={40}
+ className="w-10 h-10 rounded-full object-cover"
+ />
+ <div>
+ <p className="font-semibold">
+ {selectedConvo.participantNames?.[
+ selectedConvo.participants?.find((p: string) => p !== user?.uid) || ""
+ ] || "User"}
+ </p>
+ </div>
+ </div>
+ )}
 
-            <ChatWindow conversationId={selectedConvo?.id} />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+ <ChatWindow conversationId={selectedConvo?.id} />
+ </div>
+ </div>
+ </div>
+ </div>
+ );
 }
 
 export default function MessagesPage() {
-  return (
-    <Suspense fallback={<MessagesSkeleton />}>
-      <MessagesContent />
-    </Suspense>
-  );
+ return (
+ <Suspense fallback={<MessagesSkeleton />}>
+ <MessagesContent />
+ </Suspense>
+ );
 }
