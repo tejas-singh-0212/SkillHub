@@ -85,21 +85,23 @@ export async function POST(req: NextRequest) {
         emailSent = true;
       } catch (emailErr) {
         console.error("Failed to send OTP email:", emailErr);
+        otpStore.delete(email); // Clean up since email wasn't sent
+        return NextResponse.json(
+          { error: "Failed to send OTP email. Please check email configuration." },
+          { status: 500 }
+        );
       }
     } else {
-      // No SMTP configured — log OTP for development/demo
-      console.log(`\n🔑 OTP for ${email}: ${otp}\n`);
+      return NextResponse.json(
+        { error: "Email service is not configured. Please contact support." },
+        { status: 503 }
+      );
     }
 
     return NextResponse.json({
       success: true,
       emailSent,
-      // In development/demo mode without SMTP, include OTP in response
-      // Remove this in production!
-      ...((!smtpHost || !smtpUser || !smtpPass) && { demoOtp: otp }),
-      message: emailSent
-        ? "OTP sent to your email"
-        : "OTP generated (check console — configure SMTP for email delivery)",
+      message: "OTP sent to your email",
     });
   } catch (error) {
     console.error("OTP send error:", error);
